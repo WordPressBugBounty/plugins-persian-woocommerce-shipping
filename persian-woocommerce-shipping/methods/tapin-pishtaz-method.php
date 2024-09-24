@@ -40,14 +40,17 @@ class Tapin_Pishtaz_Method extends PWS_Tapin_Method {
 		if ( $gateway == 'tapin' ) {
 
 			if ( $args['from_province'] == $args['to_province'] ) {
-				$cost   = 183000;
-				$per_kg = 57000;
+				$vicinity = 'in';
+				$cost     = 183000;
+				$per_kg   = 57000;
 			} elseif ( PWS()->check_states_beside( $args['from_province'], $args['to_province'] ) ) {
-				$cost   = 260000;
-				$per_kg = 60000;
+				$vicinity = 'beside';
+				$cost     = 260000;
+				$per_kg   = 60000;
 			} else {
-				$cost   = 282000;
-				$per_kg = 62000;
+				$vicinity = 'out';
+				$cost     = 282000;
+				$per_kg   = 62000;
 			}
 
 			// calculate
@@ -55,40 +58,27 @@ class Tapin_Pishtaz_Method extends PWS_Tapin_Method {
 				$cost += $per_kg * ceil( ( $weight - 1000 ) / 1000 );
 			}
 
-			if ( $args['box_size'] == 10 ) {
-				$additions[] = 2.5;
-			}
+			if ( in_array( $args['box_size'], range( 1, 3 ) ) ) {
 
-			if ( in_array( $args['box_size'], range( 5, 9 ) ) ) {
-
-				$boxes = [
-					5 => 2917,
-					6 => 3750,
-					7 => 5000,
-					8 => 9000,
-					9 => 14438,
-				];
-
-				$box_rate = $boxes[ $args['box_size'] ] / $weight;
-
-				switch ( true ) {
-					case $box_rate <= 1:
-						$additions[] = 1.25;
-						break;
-					case $box_rate <= 1.5:
-						$additions[] = 1.5;
-						break;
-					case $box_rate <= 2.5:
-						$additions[] = 1.75;
-						break;
-					case $box_rate <= 3.5:
-						$additions[] = 2;
-						break;
-					default:
-						$additions[] = 2.5;
-						break;
+				if ( $weight >= 2500 ) {
+					$additions[] = 1.25;
 				}
 
+				if ( $args['content_type'] != 1 ) {
+					$additions[] = 1.25;
+				}
+
+			} elseif ( in_array( $args['box_size'], range( 4, 9 ) ) ) {
+
+				$box_rates    = include PWS_DIR . '/data/rates.php';
+				$weight_index = min( ceil( $weight / 1000 ) * 1000, 30000 );
+				$weight_index = max( 1000, $weight_index );
+
+				$cost = $box_rates[ $weight_index ][ $args['box_size'] ][ $vicinity ];
+				$cost -= 50000;
+
+			} else { // $args['box_size'] == 10
+				$additions[] = 4;
 			}
 
 		} else {
@@ -115,28 +105,20 @@ class Tapin_Pishtaz_Method extends PWS_Tapin_Method {
 				$cost += 50000 * ceil( ( $weight - 3000 ) / 1000 );
 			}
 
-		}
+			if ( $weight >= 2500 ) {
+				$additions[] = 1.25;
+			}
 
-		if ( $weight >= 2500 ) {
-			$additions[] = 1.25;
-		}
+			if ( $args['content_type'] != 1 ) {
+				$additions[] = 1.25;
+			}
 
-		if ( $args['content_type'] != 1 ) {
-			$additions[] = 1.25;
-		}
-
-		if ( $args['box_size'] >= 4 ) {
-			$additions[] = 1.25;
 		}
 
 		$cost *= max( $additions );
 
-		if ( $gateway == 'tapin' ) {
-
-			if ( in_array( $args['to_city'], [ 1, 91, 61, 51, 71, 81, 31 ] ) ) {
-				$cost *= 1.15;
-			}
-
+		if ( in_array( $args['to_city'], [ 1, 91, 61, 51, 71, 81, 31 ] ) ) {
+			$cost *= 1.15;
 		}
 
 		// INSURANCE

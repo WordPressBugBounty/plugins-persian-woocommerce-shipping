@@ -3,9 +3,9 @@ Contributors: mahdiy,nabiknet
 Tags: woocommerce,shipping,persian woocommerce,persian,ووکامرس فارسی
 Donate link: https://yun.ir/pws-pro?utm_source=donate
 Requires at least: 6.0.0
-Tested up to: 6.6.1
+Tested up to: 6.6.2
 Requires PHP: 7.4
-Stable tag: 4.1.4
+Stable tag: 4.1.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -101,6 +101,8 @@ Ask your questions in [Persian Woocommerce Shipping](https://nabik.net/contact/)
 6. Support Tapin dashboard
 
 == Changelog ==
+= 4.1.5 =
+* Tapin: Update tapin rate
 = 4.1.4 =
 * Tapin: Update tapin rate
 * Tapin: Add pocket sizes
