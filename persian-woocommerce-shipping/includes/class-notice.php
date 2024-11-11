@@ -10,7 +10,6 @@ defined( 'ABSPATH' ) || exit;
 class PWS_Notice {
 
 	public function __construct() {
-
 		add_action( 'admin_notices', [ $this, 'admin_notices' ], 5 );
 		add_action( 'wp_ajax_pws_dismiss_notice', [ $this, 'dismiss_notice' ] );
 		add_action( 'wp_ajax_pws_update_notice', [ $this, 'update_notice' ] );
@@ -88,6 +87,12 @@ class PWS_Notice {
 		$tab  = sanitize_text_field( $_GET['tab'] ?? null );
 
 		$notices = [
+			[
+				'id'        => 'yith_alarm',
+				'content'   => sprintf( '<b>هشدار:</b> شما در حال استفاده از افزونه Yith woocommerce checkout manager هستید. این افزونه دارای گزارش‌های اختلال بسیار زیادی است. از <a href="%s" target="_blank">اینجا</a> پیشنهاد جایگزین رایگان و قدرتمند آن را بخوانید.', 'https://t.me/nabik_net/210' ),
+				'condition' => is_plugin_active( 'yith-woocommerce-checkout-manager/init.php' ),
+				'dismiss'   => WEEK_IN_SECONDS,
+			],
 			[
 				'id'        => 'dokan_shipping',
 				'content'   => sprintf( '<b>حمل و نقل دکان:</b> در صورتی که قصد ایجاد یک مارکت‌پلیس حرفه‌ای و قدرتمند را دارید، می‌توانید با استفاده از <a href="%s" target="_blank">اولین و تنها افزونه حمل و نقل برای دکان</a> سیستم حمل و نقل فروشگاه‌تان را مدیریت کنید.', 'https://yun.ir/pwsdokan' ),

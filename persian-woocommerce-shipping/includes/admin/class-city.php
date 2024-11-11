@@ -11,6 +11,7 @@ class PWS_City {
 
 	public function __construct() {
 
+		add_filter( 'user_has_cap', [ $this, 'user_has_cap' ], 10, 4 );
 		add_filter( 'state_city_row_actions', [ $this, 'state_city_row_actions' ], 10, 2 );
 		add_filter( 'get_edit_term_link', [ $this, 'remove_edit_term_link' ], 10, 4 );
 
@@ -21,6 +22,7 @@ class PWS_City {
 		}
 
 		add_action( 'admin_menu', [ $this, 'admin_menu' ], 30 );
+		add_action( 'state_city_pre_add_form', [ $this, 'reinstall_cities' ], 30 );
 
 		if ( PWS_Tapin::is_enable() ) {
 			// @todo Replace with dedicated page
@@ -31,15 +33,34 @@ class PWS_City {
 		}
 	}
 
+	public function user_has_cap( array $allcaps, array $caps, array $args, WP_User $user ): array {
+		global $pagenow;
+
+		if ( in_array( 'edit_term', $args ) && $pagenow == 'edit-tags.php' ) {
+
+			$taxonomy = $_GET['taxonomy'] ?? null;
+
+			if ( $taxonomy == 'state_city' ) {
+				return [];
+			}
+
+		}
+
+		return $allcaps;
+	}
+
 	public function state_city_row_actions( array $actions, $term ): array {
 
 		if ( PWS_Tapin::is_enable() ) {
 			$actions = [];
 		}
 
-		if ( isset( $actions['edit'] ) ) {
-			unset( $actions['edit'] );
-		}
+		$actions['inline hide-if-no-js'] = sprintf(
+			'<button type="button" class="button-link editinline" aria-label="%s" aria-expanded="false">%s</button>',
+			/* translators: %s: Taxonomy term name. */
+			esc_attr( sprintf( __( 'Quick edit &#8220;%s&#8221; inline' ), $term->name ) ),
+			__( 'Quick&nbsp;Edit' )
+		);
 
 		if ( $term->parent ) {
 			return $actions;
@@ -80,6 +101,36 @@ class PWS_City {
 			'nabik_edit_state_callback',
 		] );
 
+	}
+
+	public function reinstall_cities() {
+		?>
+		<p class="submit">
+			<input type="button" id="reinstall_cities" class="button button-primary" value="نصب مجدد لیست شهرها">
+		</p>
+
+		<script type="text/javascript">
+            jQuery(document).ready(function ($) {
+
+                $(document.body).on('click', '#reinstall_cities', function () {
+
+                    $('#reinstall_cities').attr('disabled', 'disabled');
+
+                    $.ajax({
+                        url: "<?php echo admin_url( 'admin-ajax.php' ) ?>",
+                        type: 'post',
+                        data: {
+                            action: 'pws_install_cities'
+                        }
+                    }).done(function (html) {
+                        window.location.reload();
+                    });
+
+                });
+
+            });
+		</script>
+		<?php
 	}
 
 	public function nabik_edit_state_callback() {

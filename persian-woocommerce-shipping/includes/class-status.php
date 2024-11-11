@@ -204,7 +204,8 @@ class PWS_Status {
 			} else {
 				wp_enqueue_script( 'pws_tapin_list', PWS_URL . 'assets/js/tapin-list.js' );
 				wp_localize_script( 'pws_tapin_list', 'pws_tapin', [
-					'order_field' => 'id',
+					'order_field'  => 'id',
+					'status_field' => 'tr#order-',
 				] );
 			}
 
@@ -220,7 +221,8 @@ class PWS_Status {
 			if ( $screen->id == 'edit-shop_order' ) {
 				wp_enqueue_script( 'pws_tapin_list', PWS_URL . 'assets/js/tapin-list.js' );
 				wp_localize_script( 'pws_tapin_list', 'pws_tapin', [
-					'order_field' => 'post',
+					'order_field'  => 'post',
+					'status_field' => 'tr#post-',
 				] );
 			}
 

@@ -50,7 +50,7 @@ jQuery(document).ready(function ($) {
             'id': id
         };
 
-        $("tr#post-" + id + " td.order_status").html(`
+        $(pws_tapin.status_field + id + " td.order_status").html(`
                         <mark class="order-status">
                             <span>...</span>
                         </mark>
@@ -62,7 +62,7 @@ jQuery(document).ready(function ($) {
 
             if (response.success) {
 
-                $("tr#post-" + id + " td.order_status").html(`
+                $(pws_tapin.status_field + id + " td.order_status").html(`
                                 <mark class="order-status status-processing">
                                     <span>${response.message}</span>
                                 </mark>
@@ -70,13 +70,13 @@ jQuery(document).ready(function ($) {
 
             } else {
 
-                $("tr#post-" + id + " td.order_status").html(`
+                $(pws_tapin.status_field + id + " td.order_status").html(`
                                 <mark class="order-status status-pws-returned">
                                     <span>خطا در پردازش</span>
                                 </mark>
                             `);
 
-                $("tr#post-" + id + " td.column-order_number").append(`
+                $(pws_tapin.status_field + id + " td.column-order_number").append(`
                                 <mark class="order-status status-pws-returned pws-tips"
                                         style="margin-top: 10px; font-size: 11px;">
                                     <span>
