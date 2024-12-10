@@ -9,7 +9,7 @@ defined( 'ABSPATH' ) || exit;
 
 class PWS_Version {
 
-	const VERSION_KEY = 'pws_version';
+	public const VERSION_KEY = 'pws_version';
 
 	public function __construct() {
 
@@ -232,6 +232,99 @@ class PWS_Version {
 			}
 
 			delete_option( $option );
+		}
+	}
+
+	public function update_414() {
+		global $wpdb;
+		$meta_key = 'pws_map_location';
+
+		// Define the transformation function
+		$transform_meta_value = function ( $meta_value ) {
+			$array = maybe_unserialize( $meta_value );
+
+			if ( is_array( $array ) && isset( $array[0] ) ) {
+				// $array[0] is lat, I'm assuming that till this version all the clients have iran shipping
+				// iran lat is between  25.078237,39.777672
+				// Transform the simple array to an array with keys
+				if ( isset( $array[0] ) && isset( $array[1] ) && (float) $array[0] > 40 ) {
+					// if lat is more than maximum for safety we'll change lat and long
+					$array = array_reverse( $array );
+				}
+				$transformed = [
+					'lat'  => isset( $array[0] ) ? $array[0] : null,
+					'long' => isset( $array[1] ) ? $array[1] : null,
+				];
+
+				return maybe_serialize( $transformed );
+			}
+
+			return $meta_value;
+		};
+
+		// Fetch and update post meta
+		$post_meta_results = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT meta_id, meta_value FROM {$wpdb->postmeta} WHERE meta_key = %s",
+				$meta_key
+			)
+		);
+
+		foreach ( $post_meta_results as $meta ) {
+
+			$new_meta_value = $transform_meta_value( $meta->meta_value );
+
+			if ( $new_meta_value !== $meta->meta_value ) {
+				$wpdb->update(
+					$wpdb->postmeta,
+					[ 'meta_value' => $new_meta_value ],
+					[ 'meta_id' => $meta->meta_id ]
+				);
+			}
+
+		}
+
+		// Fetch and update order meta
+		$order_meta_results = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT id, meta_value FROM {$wpdb->prefix}wc_orders_meta WHERE meta_key = %s",
+				$meta_key
+			)
+		);
+
+		foreach ( $order_meta_results as $meta ) {
+
+			$new_meta_value = $transform_meta_value( $meta->meta_value );
+
+			if ( $new_meta_value !== $meta->meta_value ) {
+				$wpdb->update(
+					"{$wpdb->prefix}wc_orders_meta",
+					[ 'meta_value' => $new_meta_value ],
+					[ 'id' => $meta->id ]
+				);
+			}
+
+		}
+
+		// Fetch and update user meta
+		$user_meta_results = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT umeta_id, meta_value FROM {$wpdb->usermeta} WHERE meta_key = %s",
+				$meta_key
+			)
+		);
+
+		foreach ( $user_meta_results as $meta ) {
+			$new_meta_value = $transform_meta_value( $meta->meta_value );
+
+			if ( $new_meta_value !== $meta->meta_value ) {
+				$wpdb->update(
+					$wpdb->usermeta,
+					[ 'meta_value' => $new_meta_value ],
+					[ 'umeta_id' => $meta->umeta_id ]
+				);
+			}
+
 		}
 
 	}

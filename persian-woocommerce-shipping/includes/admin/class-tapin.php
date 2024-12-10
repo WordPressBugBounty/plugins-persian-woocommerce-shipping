@@ -22,21 +22,39 @@ class PWS_Settings_Tapin extends PWS_Settings {
 		return [
 			[
 				'id'    => 'pws_tapin',
-				'title' => 'پیشخوان مجازی پست',
+				'title' => 'همگانی',
 			],
+			[
+				'id'    => 'pws_tipax',
+				'title' => 'تیپاکس',
+			],
+//			[
+//				'id'    => 'pws_alonomic',
+//				'title' => 'الونومیک',
+//			],
 		];
 	}
 
 	public function get_fields(): array {
 
 		if ( PWS_Tapin::is_enable() ) {
-			$shop = get_transient( 'pws_tapin_shop' );
 
-			if ( $shop === false || count( (array) $shop ) == 0 ) {
-				PWS_Tapin::shop();
+			$shop = PWS_Tapin::shop();;
+
+			if ( ! isset( $shop->title ) ) {
 				$shop = '<span style="color: red;">اطلاعات فروشگاه بارگذاری نشده است و ممکن است هزینه های ارسال بطور دقیق محاسبه نشود.</span>';
 			} else {
-				$shop = sprintf( '%s | %s %s | نرخ خدمات: %s', $shop->title, PWS()::get_state( $shop->province_code ), PWS()::get_city( $shop->city_code ), wc_price( $shop->total_price, [ 'currency' => 'IRR' ] ) );
+
+				$services = PWS_Tapin::services();
+
+				$shop = sprintf( '%s | %s %s | نرخ خدمات: %s | اطلاعات %d شهر بارگذاری شد.',
+					$shop->title,
+					PWS()::get_state( $shop->province_code ),
+					PWS()::get_city( $shop->city_code ),
+					wc_price( $shop->total_price, [ 'currency' => 'IRR' ] ),
+					count( $services )
+				);
+
 				$shop = "اطلاعات فروشگاه: <span style='color: seagreen'>{$shop}</span>";
 			}
 
@@ -158,6 +176,38 @@ class PWS_Settings_Tapin extends PWS_Settings {
 <li>بیمه غرامت پست برای محصولات با حداکثر ارزش ۱۰۰ میلیون تومان پرداخت می شود.</li>
 </ol>',
 					'type' => 'html',
+				],
+			],
+			'pws_tipax' => [
+				[
+					'name' => 'notes',
+					'desc' => sprintf( 'نکات:<ol>
+<li>سرویس تیپاکس در حال حاضر بسته‌های بین ۱ تا ۶ کیلوگرم را می‌پذیرد.</li>
+<li>نمایندگی‌های دریافت سفارش‌ها در لینک روبرو قابل مشاهده هستند: https://map.tapin.ir/accept-tipax</li>
+<li style="display: %s">این امکان فقط در <a href="%s" target="_blank">نسخه حرفه‌ای</a> فعال می‌باشد.</li>
+</ol>', defined( 'PWS_PRO_VERSION' ) ? 'none' : '', PWS()->pws_pro_url( 'tipax' ) ),
+					'type' => 'html',
+				],
+				[
+					'label'   => 'نوع جمع‌آوری',
+					'name'    => 'pickup_type',
+					'default' => 20,
+					'type'    => 'select',
+					'desc'    => 'جمع‌آوری در محل مشتری برای بیشتر از ۱۰ بسته انجام می‌شود.',
+					'options' => [
+						10 => 'جمع‌آوری در محل مشتری',
+						20 => 'جمع‌آوری در نمایندگی',
+					],
+				],
+				[
+					'label'   => 'نوع تحویل',
+					'name'    => 'delivery_type',
+					'default' => 10,
+					'type'    => 'select',
+					'options' => [
+						10 => 'تحویل در محل مشتری',
+						20 => 'تحویل در نمایندگی',
+					],
 				],
 			],
 		];

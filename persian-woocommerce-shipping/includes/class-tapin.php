@@ -38,6 +38,7 @@ class PWS_Tapin extends PWS_Core {
 			'WC_Courier_Method',
 			'WC_Tipax_Method',
 			'Tapin_Pishtaz_Method',
+			'Tapin_Special_Method',
 		];
 
 		add_filter( 'get_ancestors', function ( $ancestors, $object_id, $object_type, $resource_type ) {
@@ -229,15 +230,11 @@ class PWS_Tapin extends PWS_Core {
 		return self::get_option( 'tapin.enable', false ) == 1;
 	}
 
-	public static function request( $path, $data = [], $absolute_url = null ) {
+	public static function request( $path, $data = [], $associative = null ) {
 
 		$path = trim( $path, ' / ' );
 
 		$url = sprintf( 'https://api.%s/api/%s/', self::$gateways[ self::$gateway ], $path );
-
-		if ( ! is_null( $absolute_url ) ) {
-			$url = $absolute_url;
-		}
 
 		$curl = curl_init();
 
@@ -286,7 +283,7 @@ class PWS_Tapin extends PWS_Core {
 
 		curl_close( $curl );
 
-		return json_decode( $response );
+		return json_decode( $response, $associative );
 	}
 
 	public static function zone() {
@@ -320,10 +317,6 @@ class PWS_Tapin extends PWS_Core {
 			uasort( $states, [ self::class, 'pws_sort_state' ] );
 
 			set_transient( 'pws_tapin_states', $states, DAY_IN_SECONDS );
-		}
-
-		if ( isset( $states[1018] ) ) {
-			unset( $states[1018] );
 		}
 
 		return apply_filters( 'pws_states', $states );
@@ -604,6 +597,72 @@ class PWS_Tapin extends PWS_Core {
 		}
 
 		return $shop;
+	}
+
+	public static function services(): array {
+
+		if ( empty( PWS()->get_option( 'tapin.shop_id' ) ) ) {
+			return [];
+		}
+
+		$services = get_transient( 'pws_tapin_services' );
+
+		if ( empty( $services ) ) {
+
+			PWS_Tapin::set_gateway( PWS()->get_option( 'tapin.gateway' ) );
+
+			$_services = self::request( 'v4/location/public/all/city/filter/', [
+				'shop_id' => PWS()->get_option( 'tapin.shop_id' ),
+			], true );
+
+			if ( is_wp_error( $_services ) || ! isset( $_services['entries']['cities'] ) || $_services['entries']['is_public'] ) {
+				return get_option( 'pws_tapin_services', [] );
+			}
+
+			$services = [];
+
+			foreach ( $_services['entries']['cities'] as $service ) {
+
+				$services[ $service['pk'] ] = $service;
+
+				unset( $services[ $service['pk'] ]['pk'] );
+				unset( $services[ $service['pk'] ]['title'] );
+				unset( $services[ $service['pk'] ]['province_pk'] );
+				unset( $services[ $service['pk'] ]['province_title'] );
+
+				foreach ( $services[ $service['pk'] ] as &$city_services ) {
+					$city_services = array_filter( $city_services );
+				}
+
+				$services[ $service['pk'] ] = array_filter( $services[ $service['pk'] ] );
+
+				foreach ( $services[ $service['pk'] ] as &$city_services ) {
+					unset( $city_services['is_available'] );
+				}
+			}
+
+			set_transient( 'pws_tapin_services', $services, DAY_IN_SECONDS );
+			update_option( 'pws_tapin_services', $services );
+		}
+
+		return $services;
+	}
+
+	public static function has_service( int $city_id, string $service, $order_type = null ): bool {
+
+		$services = self::services();
+
+		if ( ! isset( $services[ $city_id ][ $service ] ) ) {
+			return false;
+		}
+
+		$order_types = $services[ $city_id ][ $service ]['order_types'] ?? [ null ];
+
+		if ( ! in_array( $order_type, $order_types ) ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	public static function set_gateway( string $gateway ) {

@@ -26,7 +26,7 @@ class PWS_Settings_Tools extends PWS_Settings {
 			],
 			[
 				'id'    => 'pws_map',
-				'title' => __( 'نقشه (آزمایشی)' ),
+				'title' => 'نقشه',
 			],
 		] );
 	}
@@ -45,7 +45,7 @@ class PWS_Settings_Tools extends PWS_Settings {
 				[
 					'label'   => 'وضعیت سفارشات کمکی',
 					'name'    => 'status_enable',
-					'default' => '0',
+					'default' => 1,
 					'type'    => 'checkbox',
 					'desc'    => 'جهت مدیریت بهتر سفارشات فروشگاه، وضعیت های زیر به پنل اضافه خواهد شد.
 					<ol>
@@ -113,86 +113,113 @@ class PWS_Settings_Tools extends PWS_Settings {
 			 */
 			'pws_map'   => [
 				[
-					'name' => 'html',
-					'desc' => sprintf( '<h5>%s</h5>',
-						__( 'نقشه را در صفحه تسویه حساب و یا با استفاده از شورتکد [pws_map]، در صفحات دلخواه نمایش دهید.' )
-					),
+					'name' => 'pws_map_description',
 					'type' => 'html',
+					'desc' => '<p>نقشه را در صفحه تسویه حساب و یا با استفاده از کد کوتاه [pws_map]، در صفحات دلخواه نمایش دهید.</p>',
+					'id'   => 'pws_map_description'
 				],
 				[
-					'label'   => __( 'فعال سازی نقشه' ),
-					'name'    => 'enable',
-					'default' => '0',
-					'type'    => 'checkbox',
-					'desc'    => '',
-				],
-				[
-					'label'   => __( 'سرویس ارائه دهنده' ),
+					'label'   => 'سرویس نمایش نقشه',
 					'name'    => 'provider',
 					'type'    => 'select',
-					'default' => 'osm',
+					'default' => 'OSM',
 					'options' => [
-						'osm'    => __( 'OpenStreetMap.org' ),
-						'neshan' => __( 'Neshan.org' ),
+						'OSM'    => 'OpenStreetMap.org',
+						'neshan' => 'Neshan.org (نشان)',
+						'mapp'   => 'Map.ir (مپ)',
 					],
+					'desc'    => '<p class="pws-map__info-OSM">OpenStreetMap یک سرویس جهانی است با قابلیت‌های متنوع که برای نمایش نقشه و ارائه داده‌های جغرافیایی به‌صورت آزاد و قابل دسترس برای همه طراحی شده است.</p>' . '<p class="pws-map__info-neshan">نشان یک سرویس ایرانی با قابلیت‌های متنوع است که برای نمایش نقشه و ارائه خدمات جغرافیایی طراحی شده است.</p>' . '<p class="pws-map__info-mapp">زیرساخت نقشهٔ مپ یک پلتفرم قدرتمند است که نتیجهٔ ۲۰ سال فعالیت در حوزهٔ GIS است و برای ارائه بهترین سرویس‌های نقشه با تمرکز بر نیازهای محلی کسب‌وکارهای مکان-مبنا توسعه یافته.</p>'
+
 				],
-				[
-					'label'   => __( ' کلید دسترسی وب' ),
+
+				/*Neshan api keys*/ [
+					'label'   => ' کلید دسترسی نشان',
 					'name'    => 'neshan_api_key',
 					'default' => null,
 					'type'    => 'text',
-					'desc'    => sprintf(
-						'<b class="pws-map__help-neshan">&nbsp;%s&nbsp;<a href="%s">%s</a></b>',
-						__( 'لطفا برای دریافت کلید دسترسی نمایش نقشه پلتفرم نشان' ),
-						'https://platform.neshan.org/panel/api-key',
-						__( 'اینجا کلیک کنید' )
-					),
+					'desc'    => '<p class="pws-map__help-neshan">&nbsp;لطفا برای دریافت کلید دسترسی نمایش نقشه پلتفرم نشان&nbsp;<a href="https://platform.neshan.org/panel/api-key">اینجا کلیک کنید.</a> برای مثال: web.706963....</p>',
 				],
-				[
-					'label'   => __( 'کلید دسترسی سرویس' ),
-					'name'    => 'neshan_service_key',
+				/*Mapp (map.ir) api key*/ [
+					'label'   => 'کلید دسترسی مپ',
+					'name'    => 'mapp_api_key',
 					'default' => null,
 					'type'    => 'text',
-					'desc'    => sprintf(
-						'<b class="pws-map__help-neshan ">&nbsp;%s&nbsp;<a href="%s">%s</a></b>',
-						__( 'لطفا برای دریافت کلید دسترسی سرویس های پلتفرم نشان' ),
-						'https://platform.neshan.org/panel/api-key',
-						__( 'اینجا کلیک کنید' )
-					),
+					'desc'    => '<p class="pws-map__help-mapp">&nbsp;لطفا برای دریافت کلید دسترسی نمایش نقشه پلتفرم مپ&nbsp;<a href="https://accounts.map.ir/token-details">اینجا کلیک کنید.</a> برای مثال: ojWHertr2BCHtKXHQZL_YWwEgMw...</p>',
 				],
-				[
-					'label'   => __( 'نوع نقشه' ),
+
+				/*OpenRouteService Token*/ [
+					'label'   => 'کلید دسترسی OpenRouteService',
+					'name'    => 'ORS_token',
+					'type'    => 'text',
+					'default' => '',
+					'desc'    => 'این سرویس دهنده برای محاسبه فاصله و مسیریابی بین فروشگاه و کاربر مورد استفاده قرار می‌گیرد.<br>برای دریافت کلید دسترسی <a href="https://openrouteservice.org/dev/#/home">اینجا</a> کلیک کنید. برای مثال: 5b3ce3597851110001cf6248836ed90b1...',
+				],
+
+				/*Neshan Map Type*/ [
+					'label'   => 'نوع نقشه',
 					'name'    => 'neshan_type',
 					'type'    => 'select',
-					'default' => 'vector',
+					'default' => 'neshan',
 					'options' => [
-						'vector' => __( 'روشن' ),
-						'night'  => __( 'تاریک' ),
+						'osm-bright'     => 'روشن',
+						'standard-night' => 'شب',
+						'standard-day'   => 'روز',
+						'neshan'         => 'نشان',
+						'dreamy-gold'    => 'طلایی',
+						'dreamy'         => 'رویایی',
 					],
 				],
 				[
-					'label'   => __( 'نمایش در تسویه حساب' ),
-					'name'    => 'checkout_enable',
-					'default' => '1',
-					'type'    => 'checkbox',
-					'desc'    => __( 'نمایش نقشه در صفحه تسویه حساب و هماهنگ سازی با فرم آدرس' ),
-				],
-				[
-					'label'   => __( 'محل قرارگیری در فرم تسویه حساب' ),
+					'label'   => 'محل قرارگیری',
 					'name'    => 'checkout_placement',
 					'type'    => 'select',
-					'default' => 'after_form',
+					'default' => 'none',
 					'options' => [
-						'after_form'  => __( 'بعد از فرم' ),
-						'before_form' => __( 'قبل از فرم' ),
+						'none'        => 'عدم نمایش در فرم تسویه حساب',
+						'after_form'  => 'بعد از فرم تسویه حساب',
+						'before_form' => 'قبل از فرم تسویه حساب',
 					],
+					'desc'    => 'جایگاه نمایش (یا عدم نمایش) نقشه در فرم تسویه حساب کاربر را تعیین کنید.',
 				],
 				[
-					'label'   => __( 'الزام به انتخاب موقعیت' ),
+					'label'   => 'الزام به انتخاب موقعیت',
 					'name'    => 'required_location',
 					'default' => '1',
 					'type'    => 'checkbox',
-					'desc'    => __( 'در صورت فعال بودن این قابلیت، کاربران موظف به انتخاب مکان خود روی نقشه هستند.' ),
+					'desc'    => 'در صورت فعال بودن این قابلیت، کاربران موظف به انتخاب مکان خود روی نقشه هستند.',
+				],
+				[
+					'label'   => 'نمایش در روش حمل و نقل',
+					'name'    => 'shipping_methods',
+					'default' => '',
+					'type'    => 'multiselect',
+					'options' => PWS()->get_shipping_methods(),
+					'desc'    => 'عدم انتخاب روش حمل و نقل به منزله نمایش نقشه در تمامی روش ها می‌باشد.',
+				],
+				[
+					'label'   => 'نمایش فروشگاه',
+					'name'    => 'store_marker_enable',
+					'default' => '0',
+					'type'    => 'checkbox',
+					'desc'    => 'برای نمایش محل فروشگاه روی نقشه جهت نمایش به کاربر، فعال کنید.'
+				],
+				[
+					'label' => 'مکان فروشگاه',
+					'name'  => 'store_location',
+					'type'  => 'map',
+					'desc'  => 'مکان جغرافیایی فروشگاه خود را روی نقشه انتخاب کنید تا در محاسبات و سرویس های نقشه مورد استفاده قرار گیرد.'
+				],
+				[
+					'label'   => 'محاسبه فاصله',
+					'name'    => 'store_calculate_distance',
+					'type'    => 'select',
+					'default' => 'none',
+					'options' => [
+						'none'   => 'محاسبه نکن',
+						'direct' => 'شعاعی (سریع‌تر)',
+						'real'   => 'مسیریابی (دقیق‌تر)',
+					],
+					'desc'    => 'با نمایش فاصله فروشگاه تا کاربر؛ اطلاعات بیشتری در رابطه با سفارش برای مدیر سایت نمایش دهید.',
 				],
 			],
 		] );

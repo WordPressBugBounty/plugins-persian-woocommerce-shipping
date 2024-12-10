@@ -76,7 +76,7 @@ class PWS_Status {
 
 		$statuses = [];
 
-		if ( PWS()->get_option( 'tools.status_enable' ) == 1 ) {
+		if ( PWS()->get_option( 'tools.status_enable', 1 ) == 1 ) {
 
 			$statuses['wc-pws-in-stock'] = __( 'ارسال شده به انبار' );
 			$statuses['wc-pws-packaged'] = __( 'بسته بندی شده' );
@@ -337,11 +337,13 @@ class PWS_Status {
 			</p>
 
 			<p class="form-field-wide">
-				<label>نوع پست:</label>
+				<label>نوع ارسال:</label>
 				<select style="width: 100%" disabled="disabled">
 					<option value="" <?php selected( null, $shipping_method ); ?>>غیرپستی</option>
 					<option value="0" <?php selected( 0, $shipping_method ); ?>>پست سفارشی</option>
 					<option value="1" <?php selected( 1, $shipping_method ); ?>>پست پیشتاز</option>
+					<option value="3" <?php selected( 3, $shipping_method ); ?>>پست ویژه</option>
+					<option value="tipax" <?php selected( 'tipax', $shipping_method ); ?>>تیپاکس</option>
 				</select>
 			</p>
 
@@ -470,6 +472,8 @@ class PWS_Status {
 
 			die();
 		}
+
+		do_action( 'pws_tapin_pre_submit_order', $order );
 
 		$tapin_order_uuid = $order->get_meta( 'tapin_order_uuid' );
 

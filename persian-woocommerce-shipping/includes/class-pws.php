@@ -14,11 +14,25 @@ defined( 'ABSPATH' ) || exit;
 class PWS_Core {
 
 	/**
-	 * Shipping methods.
+	 * Appending shipping methods.
 	 *
 	 * @var array
 	 */
 	public static $methods = [];
+
+	/**
+	 * All shipping methods
+	 *
+	 * @var array
+	 */
+	public static $all_shipping_methods = [];
+
+	/**
+	 * Shipping zones
+	 *
+	 * @var array
+	 */
+	public static $all_shipping_zones = [];
 
 	/**
 	 * The single instance of the class.
@@ -117,10 +131,9 @@ class PWS_Core {
 	public function load_maps_init() {
 		require_once PWS_DIR . '/maps/class-map-service.php';
 		require_once PWS_DIR . '/maps/class-neshan.php';
+		require_once PWS_DIR . '/maps/class-mapp.php';
 		require_once PWS_DIR . '/maps/class-osm.php';
 	}
-
-	// Actions
 
 	public function state_city_taxonomy() {
 
@@ -165,6 +178,7 @@ class PWS_Core {
 		require_once PWS_DIR . '/methods/pws-pishtaz-method.php';
 		require_once PWS_DIR . '/methods/tapin-method.php';
 		require_once PWS_DIR . '/methods/tapin-pishtaz-method.php';
+		require_once PWS_DIR . '/methods/tapin-special-method.php';
 	}
 
 	public function checkout_update_order_review( $input ) {
@@ -230,15 +244,13 @@ class PWS_Core {
 		wp_enqueue_script( 'pwsCheckout' );
 	}
 
-	// Filters
-
+	
 	public function enqueue_admin_scripts() {
-		wp_enqueue_script(
-			'pws-admin-general',
-			PWS_URL . 'assets/js/admin.js',
-			[ 'jquery' ],
-			PWS_VERSION
-		);
+
+		wp_register_style( 'select2', WC()->plugin_url() . '/assets/css/select2.css' );
+		wp_enqueue_style( 'select2' );
+
+		wp_enqueue_script( 'pws-admin-general', PWS_URL . 'assets/js/admin.js', [ 'jquery', 'selectWoo' ], PWS_VERSION );
 	}
 
 	public function add_shipping_method( $methods ) {
@@ -685,7 +697,7 @@ class PWS_Core {
 		return $replace;
 	}
 
-	function my_account_my_address_formatted_address( $args, $customer_id, $name ) {
+	public function my_account_my_address_formatted_address( $args, $customer_id, $name ) {
 
 		$args['district'] = get_user_meta( $customer_id, $name . '_district', true );
 
@@ -1036,7 +1048,7 @@ class PWS_Core {
 
 		$options = wp_cache_get( 'get_terms_option_' . $term_id, 'pws' );
 
-		if ( false !== $options ) {
+		if ( $options ) {
 			return $options;
 		}
 
@@ -1161,5 +1173,132 @@ class PWS_Core {
 	public function pws_pro_url( $source ): string {
 		return 'https://yun.ir/pws-pro?utm_source=' . esc_attr( $source );
 	}
+
+	public function get_all_shipping_zones(): array {
+        if ( ! empty( self::$all_shipping_zones ) ) {
+			return self::$all_shipping_zones;
+		}
+
+		$data_store = WC_Data_Store::load( 'shipping-zone' );
+
+		foreach ( $data_store->get_zones() as $raw_zone ) {
+			self::$all_shipping_zones[] = new WC_Shipping_Zone( $raw_zone );
+		}
+
+		self::$all_shipping_zones[] = new WC_Shipping_Zone( 0 );
+
+		return self::$all_shipping_zones;
+	}
+
+	public function get_shipping_methods(): array {
+		if ( ! empty( self::$all_shipping_methods ) ) {
+			return self::$all_shipping_methods;
+		}
+
+		foreach ( WC()->shipping()->load_shipping_methods() as $method ) {
+
+			self::$all_shipping_methods[ $method->id ] = sprintf( 'همه روش‌های "%s"', $method->get_method_title() );
+
+			foreach ( $this->get_all_shipping_zones() as $zone ) {
+
+				$shipping_method_instances = $zone->get_shipping_methods();
+
+				foreach ( $shipping_method_instances as $shipping_method_instance_id => $shipping_method_instance ) {
+
+					if ( $shipping_method_instance->id !== $method->id ) {
+						continue;
+					}
+
+					$option_id = $shipping_method_instance->get_rate_id();
+
+					$option_instance_title = sprintf( '%1$s (#%2$s)', $shipping_method_instance->get_title(), $shipping_method_instance_id );
+
+					$option_title = sprintf( '%1$s - %2$s', $zone->get_id() ? $zone->get_zone_name() : __( 'Other locations', 'woocommerce' ), $option_instance_title );
+
+					self::$all_shipping_methods[ $option_id ] = $option_title;
+				}
+			}
+		}
+
+		return self::$all_shipping_methods;
+	}
+
+
+	/**
+	 * Get the map direction share link based on $order data
+	 *
+	 * @param WC_Order $order
+	 *
+	 * @return string
+	 */
+	public function get_order_map_share_link( WC_Order $order ): string {
+		$location = $this->get_map_order_location( $order );
+
+		if ( empty( $location ) ) {
+			return '';
+		}
+
+		return $this->get_map_share_link( $location['lat'], $location['long'] );
+	}
+
+	/**
+	 * Get location from order
+	 *
+	 * @param WC_Order $order
+	 * @param mixed $default
+	 *
+	 * @return array|mixed
+	 */
+	public function get_map_order_location( WC_Order $order, $default = null ) {
+		$location = $order->get_meta( 'pws_map_location' );
+
+		if ( empty( $location ) || ! isset( $location['lat'] ) || ! isset( $location['long'] ) ) {
+			return $default;
+		}
+
+		return $location;
+
+	}
+
+	/**
+	 * Creates link of map to share as sms or qrcode ,...
+	 *
+	 * @param float $lat
+	 * @param float $long
+	 * @param string $type  The map type
+     *
+	 * @return string
+	 */
+	public function get_map_share_link( float $lat, float $long, string $type = 'neshan' ): string {
+		// Set store location
+		$store_location = PWS()->get_option( 'map.store_location', '{"lat":"35.6997006457524","long":"51.33774439566025"}' );
+		$store_location = json_decode( $store_location, true );
+		$store_lat      = $store_location['lat'] ?? '35.6997006457524';
+		$store_long     = $store_location['long'] ?? '51.33774439566025';
+		$url            = '';
+
+		// Check if latitude and longitude are invalid
+		if ( ! isset( $lat, $long ) || ! is_numeric( $lat ) || ! is_numeric( $long ) ) {
+			$lat  = $store_lat;
+			$long = $store_long;
+		}
+
+		switch ( $type ) {
+			case 'neshan' :
+				$url = "https://neshan.org/maps/routing/car/origin/$store_lat,$store_long/destination/$lat,$long";
+				break;
+			case 'balad':
+				$url = "https://balad.ir/directions/driving?origin=$store_long,$store_lat&destination=$long,$lat";
+				break;
+			case 'google':
+				$url = "https://www.google.com/maps/dir/$store_lat,$store_long/$lat,$long";
+				break;
+			case 'default' :
+				$url = "https://neshan.org/maps/routing/car/origin/$store_lat,$store_long/destination/$lat,$long";
+		}
+
+		return $url;
+	}
+
 
 }

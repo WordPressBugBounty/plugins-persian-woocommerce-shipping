@@ -13,6 +13,7 @@ class PWS_Admin {
 
 		add_action( 'admin_menu', [ $this, 'admin_menu' ], 20 );
 		add_action( 'admin_head', [ $this, 'admin_head' ], 20 );
+		add_action( 'admin_enqueue_scripts', [ $this, 'admin_scripts' ], 20 );
 
 		add_filter( 'parent_file', [ $this, 'parent_file' ] );
 		add_filter( 'woocommerce_get_sections_shipping', [ $this, 'shipping_section' ], 10, 1 );
@@ -94,6 +95,22 @@ class PWS_Admin {
             });
 		</script>
 		<?php
+	}
+
+	/**
+	 * Loads the style in admin page
+	 */
+	public function admin_scripts( $hook_suffix ) {
+
+		if (! in_array( $hook_suffix, [ 'toplevel_page_pws-tools', 'woocommerce_page_wc-orders' ] ) ) {
+			return;
+		}
+		wp_enqueue_style(
+			'pws-tools-submenu-css',
+			PWS_URL . 'assets/css/admin.css',
+			[],
+			PWS_VERSION
+		);
 	}
 
 	public function parent_file( $parent_file ) {

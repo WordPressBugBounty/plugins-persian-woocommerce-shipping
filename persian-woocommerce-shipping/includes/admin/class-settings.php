@@ -40,7 +40,7 @@ class PWS_Settings {
 	/**
 	 * Enqueue scripts and styles
 	 */
-	function admin_enqueue_scripts() {
+	public function admin_enqueue_scripts() {
 		wp_enqueue_style( 'wp-color-picker' );
 
 		wp_enqueue_media();
@@ -64,7 +64,7 @@ class PWS_Settings {
 	 *
 	 * @return PWS_Settings
 	 */
-	function add_section( $section ) {
+	public function add_section( $section ) {
 		$this->settings_sections[] = $section;
 
 		return $this;
@@ -79,7 +79,7 @@ class PWS_Settings {
 		return $this->settings_fields;
 	}
 
-	function add_field( $section, $field ) {
+	public function add_field( $section, $field ) {
 		$defaults = [
 			'name'  => '',
 			'label' => '',
@@ -101,7 +101,7 @@ class PWS_Settings {
 	 * This function gets the initiated settings sections and fields. Then
 	 * registers them to WordPress and ready for use.
 	 */
-	function admin_init() {
+	public function admin_init() {
 		//register settings sections
 		foreach ( $this->get_sections() as $section ) {
 			if ( false == get_option( $section['id'] ) ) {
@@ -174,11 +174,33 @@ class PWS_Settings {
 	}
 
 	/**
+	 * Map input type is a custom model which shows a map and by clicking on it,
+	 * the coordinates will be in a same level (sibling) hidden text input
+	 * TODO : This class would not contain any dependency to the plugin [pws_map]
+	 * @param array $args settings field args
+	*/
+	public function callback_map( $args ) {
+		$value = esc_attr( $this->get_option( $args['id'], $args['section'], $args['std'] ) );
+		$size  = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : 'regular';
+		$type  = isset( $args['type'] ) ? $args['type'] : 'map';
+		$html = '<input id="pws-map-admin-edit" type="checkbox" checked/>';
+
+		// The hidden input which stores coordinates and its actually main field
+		$html .= sprintf( '<input type="hidden" class="%2$s-text %3$s" id="%4$s[%5$s]" name="%4$s[%5$s]" value="%6$s" placeholder="%7$s"/>',
+			$type, $size, $args['field_class'], $args['section'], $args['id'], $value, $args['placeholder'] );
+		$html .= $this->get_field_description( $args );
+        // The map which lets user to select city or where the store is
+		$html .= do_shortcode('[pws_map width="500px" zoom="15"]');
+		$html = $this->escape( $html );
+		echo $html;
+	}
+
+	/**
 	 * Displays a text field for a settings field
 	 *
 	 * @param array $args settings field args
 	 */
-	function callback_text( $args ) {
+	public function callback_text( $args ) {
 
 		$value = esc_attr( $this->get_option( $args['id'], $args['section'], $args['std'] ) );
 		$size  = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : 'regular';
@@ -195,7 +217,7 @@ class PWS_Settings {
 	 *
 	 * @param array $args settings field args
 	 */
-	function callback_url( $args ) {
+	public function callback_url( $args ) {
 		$this->callback_text( $args );
 	}
 
@@ -204,7 +226,7 @@ class PWS_Settings {
 	 *
 	 * @param array $args settings field args
 	 */
-	function callback_number( $args ) {
+	public function callback_number( $args ) {
 		$this->callback_text( $args );
 	}
 
@@ -213,7 +235,7 @@ class PWS_Settings {
 	 *
 	 * @param array $args settings field args
 	 */
-	function callback_checkbox( $args ) {
+	public function callback_checkbox( $args ) {
 
 		$value = esc_attr( $this->get_option( $args['id'], $args['section'], $args['std'] ) );
 
@@ -232,7 +254,7 @@ class PWS_Settings {
 	 *
 	 * @param array $args settings field args
 	 */
-	function callback_multicheck( $args ) {
+	public function callback_multicheck( $args ) {
 
 		$value = $this->get_option( $args['id'], $args['section'], $args['std'] );
 		$html  = '<fieldset>';
@@ -255,7 +277,7 @@ class PWS_Settings {
 	 *
 	 * @param array $args settings field args
 	 */
-	function callback_radio( $args ) {
+	public function callback_radio( $args ) {
 
 		$value = $this->get_option( $args['id'], $args['section'], $args['std'] );
 		$html  = '<fieldset>';
@@ -277,7 +299,7 @@ class PWS_Settings {
 	 *
 	 * @param array $args settings field args
 	 */
-	function callback_select( $args ) {
+	public function callback_select( $args ) {
 
 		$value = esc_attr( $this->get_option( $args['id'], $args['section'], $args['std'] ) );
 		$size  = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : 'regular';
@@ -293,12 +315,28 @@ class PWS_Settings {
 		echo $this->escape( $html );
 	}
 
+	public function callback_multiselect( $args ) {
+		$value = $this->get_option( $args['id'], $args['section'], $args['std'] );
+		$size  = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : 'regular';
+		$html  = sprintf( '<select class="%1$s" name="%2$s[%3$s][]" id="%2$s[%3$s]" multiple="multiple" style="width: 25em">', $size, $args['section'], $args['id'] );
+
+		foreach ( $args['options'] as $key => $label ) {
+			$selected = in_array( $key, (array) $value ) ? 'selected="selected"' : '';
+			$html .= sprintf( '<option value="%s"%s>%s</option>', esc_attr( $key ), $selected, esc_html( $label ) );
+		}
+
+		$html .= '</select>';
+		$html .= $this->get_field_description( $args );
+
+		echo $this->escape( $html );
+	}
+
 	/**
 	 * Displays a textarea for a settings field
 	 *
 	 * @param array $args settings field args
 	 */
-	function callback_textarea( $args ) {
+	public function callback_textarea( $args ) {
 
 		$value = esc_textarea( $this->get_option( $args['id'], $args['section'], $args['std'] ) );
 		$size  = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : 'regular';
@@ -316,7 +354,7 @@ class PWS_Settings {
 	 *
 	 * @return string
 	 */
-	function callback_html( $args ) {
+	public function callback_html( $args ) {
 		echo $this->get_field_description( $args );
 	}
 
@@ -325,7 +363,7 @@ class PWS_Settings {
 	 *
 	 * @param array $args settings field args
 	 */
-	function callback_wysiwyg( $args ) {
+	public function callback_wysiwyg( $args ) {
 
 		$value = $this->get_option( $args['id'], $args['section'], $args['std'] );
 		$size  = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : '500px';
@@ -354,12 +392,12 @@ class PWS_Settings {
 	 *
 	 * @param array $args settings field args
 	 */
-	function callback_file( $args ) {
+	public function callback_file( $args ) {
 
 		$value = esc_attr( $this->get_option( $args['id'], $args['section'], $args['std'] ) );
 		$size  = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : 'regular';
 		$id    = $args['section'] . '[' . $args['id'] . ']';
-		$label = isset( $args['options']['button_label'] ) ? $args['options']['button_label'] : __( 'Choose File' );
+		$label = isset( $args['options']['button_label'] ) ? $args['options']['button_label'] : __( 'انتخاب فایل' );
 
 		$html = sprintf( '<input type="text" class="%1$s-text wpsa-url" id="%2$s[%3$s]" name="%2$s[%3$s]" value="%4$s"/>', $size, $args['section'], $args['id'], $value );
 		$html .= '<input type="button" class="button wpsa-browse" value="' . $label . '" />';
@@ -373,7 +411,7 @@ class PWS_Settings {
 	 *
 	 * @param array $args settings field args
 	 */
-	function callback_password( $args ) {
+	public function callback_password( $args ) {
 
 		$value = esc_attr( $this->get_option( $args['id'], $args['section'], $args['std'] ) );
 		$size  = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : 'regular';
@@ -389,7 +427,7 @@ class PWS_Settings {
 	 *
 	 * @param array $args settings field args
 	 */
-	function callback_color( $args ) {
+	public function callback_color( $args ) {
 
 		$value = esc_attr( $this->get_option( $args['id'], $args['section'], $args['std'] ) );
 		$size  = isset( $args['size'] ) && ! is_null( $args['size'] ) ? $args['size'] : 'regular';
@@ -403,7 +441,7 @@ class PWS_Settings {
 	/**
 	 * Sanitize callback for Settings API
 	 */
-	function sanitize_options( $options ) {
+	public function sanitize_options( $options ) {
 		foreach ( $options as $option_slug => $option_value ) {
 			$sanitize_callback = $this->get_sanitize_callback( $option_slug );
 
@@ -424,7 +462,7 @@ class PWS_Settings {
 	 *
 	 * @return mixed string or bool false
 	 */
-	function get_sanitize_callback( $slug = '' ) {
+	public function get_sanitize_callback( $slug = '' ) {
 		if ( empty( $slug ) ) {
 			return false;
 		}
@@ -453,7 +491,7 @@ class PWS_Settings {
 	 *
 	 * @return string
 	 */
-	function get_option( $option, $section, $default = '' ) {
+	public function get_option( $option, $section, $default = '' ) {
 
 		$options = get_option( $section );
 
@@ -469,7 +507,7 @@ class PWS_Settings {
 	 *
 	 * Shows all the settings section labels as tab
 	 */
-	function show_navigation() {
+	public function show_navigation() {
 
 		if ( count( $this->get_sections() ) == 1 ) {
 			return false;
@@ -500,7 +538,7 @@ class PWS_Settings {
 	 *
 	 * This function displays every sections in a different form
 	 */
-	function show_forms() {
+	public function show_forms() {
 		do_action( 'pws_settings_top_form' );
 		?>
 		<div class="metabox-holder">
@@ -531,7 +569,7 @@ class PWS_Settings {
 	 *
 	 * This code uses localstorage for displaying active tabs
 	 */
-	function script() {
+	public function script() {
 		?>
 		<script>
             jQuery(document).ready(function ($) {

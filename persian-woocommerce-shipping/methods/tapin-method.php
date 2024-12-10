@@ -19,6 +19,16 @@ if ( class_exists( 'PWS_Tapin_Method' ) ) {
  */
 class PWS_Tapin_Method extends PWS_Shipping_Method {
 
+	/**
+	 * @var int
+	 */
+	public int $extra_cost;
+
+	/**
+	 * @var string
+	 */
+	public string $fixed_cost;
+
 	public function init() {
 
 		parent::init();

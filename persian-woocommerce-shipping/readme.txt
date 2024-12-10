@@ -3,9 +3,9 @@ Contributors: mahdiy,nabiknet
 Tags: woocommerce,shipping,persian woocommerce,persian,ووکامرس فارسی
 Donate link: https://yun.ir/pws-pro?utm_source=donate
 Requires at least: 6.0.0
-Tested up to: 6.6.2
+Tested up to: 6.7.1
 Requires PHP: 7.4
-Stable tag: 4.2.0
+Stable tag: 4.2.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -101,6 +101,11 @@ Ask your questions in [Persian Woocommerce Shipping](https://nabik.net/contact/)
 6. Support Tapin dashboard
 
 == Changelog ==
+= 4.2.1 =
+* Tapin: Add Tipax service
+* Tapin: Add special post service
+* Tapin: Implement new cities list
+* Refactor: Improve update notice performance
 = 4.2.0 =
 * Tweak: Release new installer, improve install default cities
 * Tweak: Add reinstall cities feature

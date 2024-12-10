@@ -17,6 +17,8 @@ class PWS_SMS {
 
 		add_action( 'woocommerce_order_status_changed', [ $this, 'order_status_changed' ], 100, 3 );
 		add_action( 'pws_save_order_post_barcode', [ $this, 'save_order_post_barcode' ], 100, 2 );
+
+		return true;
 	}
 
 	public function order_status_changed( $order_id, $old_status = '', $new_status = 'created' ) {

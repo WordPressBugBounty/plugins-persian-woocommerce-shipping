@@ -41,24 +41,15 @@ class Tapin_Pishtaz_Method extends PWS_Tapin_Method {
 
 			if ( $args['from_province'] == $args['to_province'] ) {
 				$vicinity = 'in';
-				$cost     = 183000;
-				$per_kg   = 57000;
 			} elseif ( PWS()->check_states_beside( $args['from_province'], $args['to_province'] ) ) {
 				$vicinity = 'beside';
-				$cost     = 260000;
-				$per_kg   = 60000;
 			} else {
 				$vicinity = 'out';
-				$cost     = 282000;
-				$per_kg   = 62000;
 			}
 
-			// calculate
-			if ( $weight > 1000 ) {
-				$cost += $per_kg * ceil( ( $weight - 1000 ) / 1000 );
-			}
+			$box_size = max( 1, min( 10, $args['box_size'] ) );
 
-			if ( in_array( $args['box_size'], range( 1, 3 ) ) ) {
+			if ( in_array( $box_size, range( 1, 3 ) ) ) {
 
 				if ( $weight >= 2500 ) {
 					$additions[] = 1.25;
@@ -68,18 +59,13 @@ class Tapin_Pishtaz_Method extends PWS_Tapin_Method {
 					$additions[] = 1.25;
 				}
 
-			} elseif ( in_array( $args['box_size'], range( 4, 9 ) ) ) {
-
-				$box_rates    = include PWS_DIR . '/data/rates.php';
-				$weight_index = min( ceil( $weight / 1000 ) * 1000, 30000 );
-				$weight_index = max( 1000, $weight_index );
-
-				$cost = $box_rates[ $weight_index ][ $args['box_size'] ][ $vicinity ];
-				$cost -= 50000;
-
-			} else { // $args['box_size'] == 10
-				$additions[] = 4;
 			}
+
+			$box_rates    = include PWS_DIR . '/data/pishtaz-rates.php';
+			$weight_index = min( ceil( $weight / 1000 ) * 1000, 30000 );
+			$weight_index = max( 1000, $weight_index );
+
+			$cost = $box_rates[ $weight_index ][ $box_size ][ $vicinity ];
 
 		} else {
 
@@ -147,7 +133,25 @@ class Tapin_Pishtaz_Method extends PWS_Tapin_Method {
 
 		// COD
 		if ( $args['is_cod'] ) {
-			$cost += $args['price'] * 0.01;
+
+			switch ( true ) {
+				case $args['price'] >= 200000000:
+					$cost += 120000;
+					break;
+				case $args['price'] >= 50000000:
+					$cost += 90000;
+					break;
+				case $args['price'] >= 10000000:
+					$cost += 80000;
+					break;
+				case $args['price'] >= 5000000:
+					$cost += 70000;
+					break;
+				default:
+					$cost += $args['price'] * 0.01;
+					break;
+			}
+
 		}
 
 		// TAX

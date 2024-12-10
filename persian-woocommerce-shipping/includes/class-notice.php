@@ -45,16 +45,16 @@ class PWS_Notice {
 		<script type="text/javascript">
             jQuery(document).ready(function ($) {
 
-                $(document.body).on('click', '.notice-dismiss', function () {
+                jQuery(document.body).on('click', '.notice-dismiss', function () {
 
-                    let notice = $(this).closest('.pws_notice');
+                    let notice = jQuery(this).closest('.pws_notice');
                     notice = notice.attr('id');
 
                     if (notice !== undefined && notice.indexOf('pws_') !== -1) {
 
                         notice = notice.replace('pws_', '');
 
-                        $.ajax({
+                        jQuery.ajax({
                             url: "<?php echo admin_url( 'admin-ajax.php' ) ?>",
                             type: 'post',
                             data: {
@@ -67,14 +67,27 @@ class PWS_Notice {
 
                 });
 
-                $.ajax({
-                    url: "<?php echo admin_url( 'admin-ajax.php' ) ?>",
+            });
+		</script>
+		<?php
+
+		if ( get_transient( 'pws_update_notices' ) ) {
+			return;
+		}
+
+		?>
+		<script type="text/javascript">
+            jQuery(document).ready(function ($) {
+
+                jQuery.ajax({
+                    url: "<?php echo esc_url( admin_url( 'admin-ajax.php' ) ) ?>",
                     type: 'post',
                     data: {
                         action: 'pws_update_notice',
                         nonce: '<?php echo wp_create_nonce( 'pws_update_notice' ); ?>'
                     }
                 });
+
             });
 		</script>
 		<?php
@@ -188,7 +201,7 @@ class PWS_Notice {
 			return;
 		}
 
-		set_transient( 'pws_update_notices', 1, DAY_IN_SECONDS / 10 );
+		set_transient( 'pws_update_notices', 1, HOUR_IN_SECONDS );
 
 		check_ajax_referer( 'pws_update_notice', 'nonce' );
 

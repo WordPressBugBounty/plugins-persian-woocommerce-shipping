@@ -39,14 +39,24 @@ class PWS_Order {
 		$shipping_method = null;
 
 		foreach ( $order->get_shipping_methods() as $shipping_item ) {
-			if ( strpos( $shipping_item->get_method_id(), 'Tapin_Pishtaz_Method' ) === 0 ) {
+			if ( str_contains( $shipping_item->get_method_id(), 'Tapin_Pishtaz_Method' ) ) {
 				$shipping_method = 1;
+			}
+
+			if ( str_contains( $shipping_item->get_method_id(), 'Tapin_Special_Method' ) ) {
+				$shipping_method = 3;
+			}
+
+			if ( str_contains( $shipping_item->get_method_id(), 'Tapin_Tipax_Method' ) ) {
+				$shipping_method = 'tipax';
 			}
 		}
 
 		$labels = [
-			'سفارشی',
-			'پیشتاز',
+			0       => 'سفارشی',
+			1       => 'پیشتاز',
+			3       => 'ویژه',
+			'tipax' => 'تیپاکس',
 		];
 
 		if ( $label ) {
@@ -78,4 +88,84 @@ class PWS_Order {
 		return $box_size;
 	}
 
+	public static function tapin_post_products( WC_order $order, $default_product_title = null ): array {
+
+		$products = [];
+
+		foreach ( $order->get_items() as $order_item ) {
+
+			/** @var WC_Product $product */
+			$product = $order_item->get_product();
+
+			if ( $product && $product->is_virtual() ) {
+				continue;
+			}
+
+			$price = ( $order_item->get_total() + $order_item->get_total_tax() ) / $order_item->get_quantity();
+			$price = ceil( $price );
+
+			$price = PWS()->convert_currency_to_IRR( $price );
+
+			$title = trim( $default_product_title );
+
+			if ( empty( $title ) ) {
+				$title = $order_item->get_name();
+			}
+
+			if ( function_exists( 'mb_substr' ) ) {
+				$title = mb_substr( $title, 0, 50 );
+			}
+
+			$products[] = [
+				'count'      => $order_item->get_quantity(),
+				'discount'   => 0,
+				'price'      => intval( $price ),
+				'title'      => $title,
+				'weight'     => 0,
+				'product_id' => null,
+			];
+		}
+
+		return $products;
+	}
+
+	public static function tapin_tipax_products( WC_order $order, $default_product_title = null ): array {
+
+		$products = [];
+
+		foreach ( $order->get_items() as $order_item ) {
+
+			/** @var WC_Product $product */
+			$product = $order_item->get_product();
+
+			if ( $product && $product->is_virtual() ) {
+				continue;
+			}
+
+			$price = ( $order_item->get_total() + $order_item->get_total_tax() ) / $order_item->get_quantity();
+			$price = ceil( $price );
+
+			$price = PWS()->convert_currency_to_IRR( $price );
+
+			$title = trim( $default_product_title );
+
+			if ( empty( $title ) ) {
+				$title = $order_item->get_name();
+			}
+
+			if ( function_exists( 'mb_substr' ) ) {
+				$title = mb_substr( $title, 0, 50 );
+			}
+
+			$products[] = [
+				'count'              => $order_item->get_quantity(),
+				'discount_per_count' => 0,
+				'amount_per_count'   => intval( $price ),
+				'title'              => $title,
+				'weight_per_count'   => PWS_Product::get_weight( $product ),
+			];
+		}
+
+		return $products;
+	}
 }
