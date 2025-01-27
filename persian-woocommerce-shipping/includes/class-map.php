@@ -39,6 +39,50 @@ class PWS_Map {
 	}
 
 	/**
+	 * Check if map is enabled and showing in checkout
+	 *
+	 * @return bool
+	 */
+	public static function is_enable(): bool {
+		return in_array( self::get_checkout_placement(), [ 'after_form', 'before_form' ] );
+	}
+
+
+	/**
+	 * Get the map placement in checkout form
+	 * Map feature is disabled by default
+	 *
+	 * @return string
+	 */
+	public static function get_checkout_placement(): string {
+		return apply_filters( 'pws_map_checkout_placement', PWS()->get_option( 'map.checkout_placement', 'none' ) );
+	}
+
+
+
+	/**
+	 * Map should only load in this shipping methods
+	 * Contains a list of shipping methods
+	 *
+	 * @return array
+	 */
+	public static function get_shipping_methods(): array {
+		return apply_filters( 'pws_map_enabled_shipping_methods', PWS()->get_option( 'map.shipping_methods', [ 'all_shipping_methods' ] ) );
+	}
+
+	/**
+	 * Get the map location requirement status
+	 *
+	 * @return bool
+	 */
+	public static function required_location(): bool {
+		$is_location_required = PWS()->get_option( 'map.required_location', 1 ) == 1;
+
+		return apply_filters( 'pws_map_required_location', $is_location_required );
+	}
+
+
+	/**
 	 * Save admin changed map location to the order
 	 * @HPOS_COMPATIBLE
 	 *
@@ -190,7 +234,7 @@ class PWS_Map {
 
 		$map_location_meta_value = PWS()->get_map_order_location( $order );
 
-		if ( empty( $map_location_meta_value ) ) {
+		if ( ! isset( $map_location_meta_value['lat'], $map_location_meta_value['long'] ) ) {
 			echo 'مختصات ارسال سفارش ثبت نشده.';
 
 			return;

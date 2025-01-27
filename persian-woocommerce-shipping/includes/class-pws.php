@@ -210,20 +210,20 @@ class PWS_Core {
 		}
 
 		?>
-		<tr valign="top">
-		<th scope="row" class="titledesc">
-			<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
-		</th>
-		<td class="forminp">
-			<select name="<?php echo esc_attr( $value['id'] ); ?>"
-					style="<?php echo esc_attr( $value['css'] ); ?>"
-					data-placeholder="<?php esc_attr_e( 'Choose a country&hellip;', 'woocommerce' ); ?>"
-					aria-label="<?php esc_attr_e( 'Country', 'woocommerce' ) ?>"
-					class="wc-enhanced-select">
+        <tr valign="top">
+        <th scope="row" class="titledesc">
+            <label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
+        </th>
+        <td class="forminp">
+            <select name="<?php echo esc_attr( $value['id'] ); ?>"
+                    style="<?php echo esc_attr( $value['css'] ); ?>"
+                    data-placeholder="<?php esc_attr_e( 'Choose a country&hellip;', 'woocommerce' ); ?>"
+                    aria-label="<?php esc_attr_e( 'Country', 'woocommerce' ) ?>"
+                    class="wc-enhanced-select">
 				<?php WC()->countries->country_dropdown_options( $country, $state ); ?>
-			</select>
-		</td>
-		</tr><?php
+            </select>
+        </td>
+        </tr><?php
 	}
 
 	public function enqueue_select2_scripts() {
@@ -244,7 +244,7 @@ class PWS_Core {
 		wp_enqueue_script( 'pwsCheckout' );
 	}
 
-	
+
 	public function enqueue_admin_scripts() {
 
 		wp_register_style( 'select2', WC()->plugin_url() . '/assets/css/select2.css' );
@@ -1175,7 +1175,7 @@ class PWS_Core {
 	}
 
 	public function get_all_shipping_zones(): array {
-        if ( ! empty( self::$all_shipping_zones ) ) {
+		if ( ! empty( self::$all_shipping_zones ) ) {
 			return self::$all_shipping_zones;
 		}
 
@@ -1234,7 +1234,7 @@ class PWS_Core {
 	public function get_order_map_share_link( WC_Order $order ): string {
 		$location = $this->get_map_order_location( $order );
 
-		if ( empty( $location ) ) {
+		if ( ! isset( $location['lat'], $location['long'] ) ) {
 			return '';
 		}
 
@@ -1252,7 +1252,7 @@ class PWS_Core {
 	public function get_map_order_location( WC_Order $order, $default = null ) {
 		$location = $order->get_meta( 'pws_map_location' );
 
-		if ( empty( $location ) || ! isset( $location['lat'] ) || ! isset( $location['long'] ) ) {
+		if ( ! isset( $location['lat'], $location['long'] ) ) {
 			return $default;
 		}
 
@@ -1265,11 +1265,11 @@ class PWS_Core {
 	 *
 	 * @param float $lat
 	 * @param float $long
-	 * @param string $type  The map type
-     *
+	 * @param string $type The map type
+	 *
 	 * @return string
 	 */
-	public function get_map_share_link( float $lat, float $long, string $type = 'neshan' ): string {
+	public function get_map_share_link( $lat, $long, string $type = 'neshan' ): string {
 		// Set store location
 		$store_location = PWS()->get_option( 'map.store_location', '{"lat":"35.6997006457524","long":"51.33774439566025"}' );
 		$store_location = json_decode( $store_location, true );

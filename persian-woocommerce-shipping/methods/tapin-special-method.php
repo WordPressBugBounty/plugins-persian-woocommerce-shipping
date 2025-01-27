@@ -24,14 +24,18 @@ class Tapin_Special_Method extends PWS_Tapin_Method {
 		$this->id                 = 'Tapin_Special_Method';
 		$this->instance_id        = absint( $instance_id );
 		$this->method_title       = 'پست ویژه - تاپین';
-		$this->method_description = 'ارسال کالا با استفاده از پست ويژه - تاپین (سرویس پست‌کتاب پست ویژه ندارد)';
+		$this->method_description = 'ارسال کالا با استفاده از پست ويژه - تاپین (سرویس پست‌کتاب پست ویژه ندارد، پست ویژه مخصوص مراکز استان است)';
 
 		parent::__construct();
 	}
 
 	public function is_available( $package = [] ): bool {
 
-		// @todo check special is active in selected city?
+		$city_id = intval( $package['destination']['city'] );
+
+		if ( ! PWS_Tapin::has_service( $city_id, 'irpost', 3 ) ) {
+			return false;
+		}
 
 		return parent::is_available( $package );
 	}

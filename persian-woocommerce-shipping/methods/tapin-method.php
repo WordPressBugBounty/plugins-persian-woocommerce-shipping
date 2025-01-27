@@ -33,7 +33,7 @@ class PWS_Tapin_Method extends PWS_Shipping_Method {
 
 		parent::init();
 
-		$this->extra_cost = $this->get_option( 'extra_cost', 0 );
+		$this->extra_cost = intval( $this->get_option( 'extra_cost', 0 ) );
 		$this->fixed_cost = $this->get_option( 'fixed_cost' );
 
 		add_action( 'woocommerce_update_options_shipping_' . $this->id, [ $this, 'process_admin_options' ] );
@@ -87,7 +87,7 @@ class PWS_Tapin_Method extends PWS_Shipping_Method {
 		}
 
 		$options = PWS()->get_terms_option( $this->get_destination( $package ) );
-		$options = array_column( $options,  'forehand_cost' );
+		$options = array_column( $options, 'forehand_cost' );
 
 		foreach ( $options as $option ) {
 			if ( $option != '' ) {
@@ -98,7 +98,7 @@ class PWS_Tapin_Method extends PWS_Shipping_Method {
 		}
 
 		if ( $this->fixed_cost !== '' ) {
-			$this->add_rate_cost( intval( $this->fixed_cost ) + intval( $this->extra_cost ), $package );
+			$this->add_rate_cost( intval( $this->fixed_cost ) + $this->extra_cost, $package );
 
 			return;
 		}

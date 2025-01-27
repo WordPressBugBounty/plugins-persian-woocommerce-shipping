@@ -37,7 +37,7 @@ final class PWS_Map_OSM extends PWS_Map_Service {
 		// the main thing here is json! in the default settings we have to convert array.
 		$store_location = '{"lat":"35.6997006457524","long":"51.33774439566025"}';
 
-		if (is_admin() || $store_marker_enable ) {
+		if ( is_admin() || $store_marker_enable ) {
 			$store_location = PWS()->get_option( 'map.store_location', $store_location );
 		}
 
@@ -45,41 +45,43 @@ final class PWS_Map_OSM extends PWS_Map_Service {
 		$store_lat      = $center_lat = $store_location['lat'] ?? '35.6997006457524';
 		$store_long     = $center_long = $store_location['long'] ?? '51.33774439566025';
 
-		$store_marker_image     = apply_filters( 'pws_map_store_marker_image', PWS_URL . 'assets/images/store-marker.png' );
-		$store_draw_line_color  = apply_filters( 'pws_map_store_draw_line_color', 'green' );
+		$store_marker_image    = apply_filters( 'pws_map_store_marker_image', PWS_URL . 'assets/images/store-marker.png' );
+		$store_draw_line_color = apply_filters( 'pws_map_store_draw_line_color', 'green' );
 
-		$show_distance_type     = PWS()->get_option( 'map.store_calculate_distance', 'none' );
-		$user_marker_image = apply_filters( 'pws_map_user_marker_image', PWS_URL . 'assets/images/map-marker.png' );
-		$user_marker_color = apply_filters( 'pws_map_user_marker_color', '#FF8330' );
-		$user_has_location = false;
-		$required_location = PWS()->get_option( 'map.required_location', true );
-		$map_location      = [];
+		$show_distance_type = PWS()->get_option( 'map.store_calculate_distance', 'none' );
+		$user_marker_image  = apply_filters( 'pws_map_user_marker_image', PWS_URL . 'assets/images/map-marker.png' );
+		$user_marker_color  = apply_filters( 'pws_map_user_marker_color', '#FF8330' );
+		$user_has_location  = false;
+		$required_location  = PWS()->get_option( 'map.required_location', true );
+		$map_location       = [];
 
 		if ( is_user_logged_in() && ! $this->is_admin_tools_page() ) {
 			$map_location = get_user_meta( get_current_user_id(), 'pws_map_location', true );
 		}
 
-		if ( ! empty( $map_location ) ) {
+		if ( isset( $map_location['lat'], $map_location_['long'] ) ) {
+
 			$center_lat        = $map_location['lat'];
 			$center_long       = $map_location['long'];
 			$user_has_location = true;
+
 		}
 
 		$atts = shortcode_atts( [
-			'min-width'              => '400px',
-			'min-height'             => '400px',
-			'width'                  => '100%',
-			'user-marker-color'      => $user_marker_color,
-			'center-lat'             => $center_lat,
-			'center-long'            => $center_long,
-			'store-lat'              => $store_lat,
-			'store-long'             => $store_long,
-			'zoom'                   => '6',
-			'type'                   => 'vector',
-			'user-has-location'      => $user_has_location,
-			'user-marker-url'        => $user_marker_image,
-			'store-marker-url'       => $store_marker_image,
-			'show-distance-type'     => $show_distance_type
+			'min-width'          => '400px',
+			'min-height'         => '400px',
+			'width'              => '100%',
+			'user-marker-color'  => $user_marker_color,
+			'center-lat'         => $center_lat,
+			'center-long'        => $center_long,
+			'store-lat'          => $store_lat,
+			'store-long'         => $store_long,
+			'zoom'               => '6',
+			'type'               => 'vector',
+			'user-has-location'  => $user_has_location,
+			'user-marker-url'    => $user_marker_image,
+			'store-marker-url'   => $store_marker_image,
+			'show-distance-type' => $show_distance_type
 
 		], $atts, 'pws_map' );
 
@@ -97,14 +99,10 @@ final class PWS_Map_OSM extends PWS_Map_Service {
 
 		$generated_id = rand( 0, 300 );
 
-		$enabled_shipping_methods = PWS()->get_option( 'map.shipping_methods' );
-		// In this situation, map always loads in all shipping methods
-		if ( empty( $enabled_shipping_methods ) ) {
-			$enabled_shipping_methods = wp_json_encode( [ 'all_shipping_methods' ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
-		} else {
-			$enabled_shipping_methods = wp_json_encode( $enabled_shipping_methods, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
-		}
+		$enabled_shipping_methods = PWS_Map::get_shipping_methods();
 
+		// In this situation, map always loads in all shipping methods
+		$enabled_shipping_methods = wp_json_encode( $enabled_shipping_methods, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 
 		return <<<MAP_TEMPLATE
                              <div class="pws-map__container"

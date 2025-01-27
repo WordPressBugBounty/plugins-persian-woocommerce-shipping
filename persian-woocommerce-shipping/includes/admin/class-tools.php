@@ -184,7 +184,7 @@ class PWS_Settings_Tools extends PWS_Settings {
 				[
 					'label'   => 'الزام به انتخاب موقعیت',
 					'name'    => 'required_location',
-					'default' => '1',
+					'default' => 1,
 					'type'    => 'checkbox',
 					'desc'    => 'در صورت فعال بودن این قابلیت، کاربران موظف به انتخاب مکان خود روی نقشه هستند.',
 				],

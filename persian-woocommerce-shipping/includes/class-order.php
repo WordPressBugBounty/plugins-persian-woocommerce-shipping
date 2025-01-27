@@ -50,13 +50,18 @@ class PWS_Order {
 			if ( str_contains( $shipping_item->get_method_id(), 'Tapin_Tipax_Method' ) ) {
 				$shipping_method = 'tipax';
 			}
+
+			if ( str_contains( $shipping_item->get_method_id(), 'Tapin_Alonomic_Method' ) ) {
+				$shipping_method = 'alonomic';
+			}
 		}
 
 		$labels = [
-			0       => 'سفارشی',
-			1       => 'پیشتاز',
-			3       => 'ویژه',
-			'tipax' => 'تیپاکس',
+			0          => 'سفارشی',
+			1          => 'پیشتاز',
+			3          => 'ویژه',
+			'tipax'    => 'تیپاکس',
+			'alonomic' => 'الونومیک',
 		];
 
 		if ( $label ) {
@@ -130,6 +135,10 @@ class PWS_Order {
 	}
 
 	public static function tapin_tipax_products( WC_order $order, $default_product_title = null ): array {
+		return self::tapin_v4_products( $order, $default_product_title );
+	}
+
+	public static function tapin_v4_products( WC_order $order, $default_product_title = null ): array {
 
 		$products = [];
 
@@ -162,7 +171,7 @@ class PWS_Order {
 				'discount_per_count' => 0,
 				'amount_per_count'   => intval( $price ),
 				'title'              => $title,
-				'weight_per_count'   => PWS_Product::get_weight( $product ),
+				'weight_per_count'   => 0,
 			];
 		}
 

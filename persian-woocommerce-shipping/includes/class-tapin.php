@@ -232,7 +232,7 @@ class PWS_Tapin extends PWS_Core {
 
 	public static function request( $path, $data = [], $associative = null ) {
 
-		$path = trim( $path, ' / ' );
+		$path = trim( $path, ' /' );
 
 		$url = sprintf( 'https://api.%s/api/%s/', self::$gateways[ self::$gateway ], $path );
 

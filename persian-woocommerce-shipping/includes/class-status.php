@@ -199,7 +199,7 @@ class PWS_Status {
 			if ( in_array( $action, [ 'new', 'edit' ] ) ) {
 				wp_enqueue_script( 'pws_tapin_order', PWS_URL . 'assets/js/tapin-order.js' );
 				wp_localize_script( 'pws_tapin_order', 'pws_tapin', [
-					'order_id' => intval( $_GET['id'] ),
+					'order_id' => intval( $_GET['id'] ?? 0 ),
 				] );
 			} else {
 				wp_enqueue_script( 'pws_tapin_list', PWS_URL . 'assets/js/tapin-list.js' );
@@ -344,6 +344,7 @@ class PWS_Status {
 					<option value="1" <?php selected( 1, $shipping_method ); ?>>پست پیشتاز</option>
 					<option value="3" <?php selected( 3, $shipping_method ); ?>>پست ویژه</option>
 					<option value="tipax" <?php selected( 'tipax', $shipping_method ); ?>>تیپاکس</option>
+					<option value="alonomic" <?php selected( 'alonomic', $shipping_method ); ?>>الونومیک</option>
 				</select>
 			</p>
 
@@ -489,52 +490,7 @@ class PWS_Status {
 				die();
 			}
 
-			$products = [];
-
-			foreach ( $order->get_items() as $order_item ) {
-
-				/** @var WC_Product $product */
-				$product = $order_item->get_product();
-
-				if ( $product && $product->is_virtual() ) {
-					continue;
-				}
-
-				$price = ( $order_item->get_total() + $order_item->get_total_tax() ) / $order_item->get_quantity();
-				$price = ceil( $price );
-
-				if ( get_woocommerce_currency() == 'IRT' ) {
-					$price *= 10;
-				}
-
-				if ( get_woocommerce_currency() == 'IRHR' ) {
-					$price *= 1000;
-				}
-
-				if ( get_woocommerce_currency() == 'IRHT' ) {
-					$price *= 10000;
-				}
-
-				$title = trim( PWS()->get_option( 'tapin.product_title' ) );
-
-				if ( empty( $title ) ) {
-					$title = $order_item->get_name();
-				}
-
-				if ( function_exists( 'mb_substr' ) ) {
-					$title = mb_substr( $title, 0, 50 );
-				}
-
-				$products[] = [
-					'count'      => $order_item->get_quantity(),
-					'discount'   => 0,
-					'price'      => intval( $price ),
-					'title'      => $title,
-					'weight'     => 0,
-					'product_id' => null,
-				];
-			}
-
+			$products           = PWS_Order::tapin_post_products( $order, PWS()->get_option( 'tapin.product_title' ) );
 			$order_weight       = PWS_Order::get_weight( $order );
 			$tapin_content_type = PWS_Order::get_content_type( $order );
 			$tapin_box_size     = PWS_Order::get_box_size( $order );

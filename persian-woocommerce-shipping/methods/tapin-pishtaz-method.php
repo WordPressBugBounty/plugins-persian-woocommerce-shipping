@@ -37,6 +37,8 @@ class Tapin_Pishtaz_Method extends PWS_Tapin_Method {
 
 		$additions = [ 1 ];
 
+		$box_size = max( 1, min( 10, $args['box_size'] ) );
+
 		if ( $gateway == 'tapin' ) {
 
 			if ( $args['from_province'] == $args['to_province'] ) {
@@ -47,20 +49,6 @@ class Tapin_Pishtaz_Method extends PWS_Tapin_Method {
 				$vicinity = 'out';
 			}
 
-			$box_size = max( 1, min( 10, $args['box_size'] ) );
-
-			if ( in_array( $box_size, range( 1, 3 ) ) ) {
-
-				if ( $weight >= 2500 ) {
-					$additions[] = 1.25;
-				}
-
-				if ( $args['content_type'] != 1 ) {
-					$additions[] = 1.25;
-				}
-
-			}
-
 			$box_rates    = include PWS_DIR . '/data/pishtaz-rates.php';
 			$weight_index = min( ceil( $weight / 1000 ) * 1000, 30000 );
 			$weight_index = max( 1000, $weight_index );
@@ -69,31 +57,19 @@ class Tapin_Pishtaz_Method extends PWS_Tapin_Method {
 
 		} else {
 
-			switch ( true ) {
-				case $weight <= 500:
-					$cost = 183400;
-					break;
-				case $weight >= 501 && $weight <= 1000:
-					$cost = 202400;
-					break;
-				case $weight >= 1001 && $weight <= 2000:
-					$cost = 247400;
-					break;
-				case $weight >= 2001 && $weight <= 2500:
-					$cost = 297400;
-					break;
-				default:
-					$cost = 300120;
+			$box_rates    = include PWS_DIR . '/data/posteketab-rates.php';
+			$weight_index = min( ceil( $weight / 1000 ) * 1000, 30000 );
+			$weight_index = max( 1000, $weight_index );
+
+			if ( $weight <= 500 ) {
+				$weight_index = 500;
 			}
 
-			// calculate
-			if ( $weight > 3000 ) {
-				$cost += 50000 * ceil( ( $weight - 3000 ) / 1000 );
-			}
+			$cost = $box_rates[ $weight_index ][ $box_size ];
 
-			if ( $weight >= 2500 ) {
-				$additions[] = 1.25;
-			}
+		}
+
+		if ( in_array( $box_size, range( 1, 3 ) ) ) {
 
 			if ( $args['content_type'] != 1 ) {
 				$additions[] = 1.25;

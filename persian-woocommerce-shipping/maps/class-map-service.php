@@ -47,8 +47,8 @@ class PWS_Map_Service {
 	public function __construct() {
 
 		// Set general options as class properties
-		$this->checkout_placement = PWS()->get_option( 'map.checkout_placement', 'none' );
-		$this->required_location  = PWS()->get_option( 'map.required_location', true );
+		$this->checkout_placement = PWS_Map::get_checkout_placement();
+		$this->required_location  = PWS_Map::required_location();
 
 		$this->set_map_params( 'ORS_token', PWS()->get_option( 'map.ORS_token', true ) );
 		$this->set_map_params( 'is_admin', is_admin() );
@@ -299,16 +299,15 @@ class PWS_Map_Service {
 		$map_location_json = stripslashes( $map_location_json );
 		$map_location      = json_decode( $map_location_json, true );
 
-		if ( ! empty( json_last_error() ) || empty( $map_location ) ) {
+		if ( ! empty( json_last_error() ) || ! isset( $map_location['lat'], $map_location['long'] ) ) {
 			wc_add_notice( __( 'مقصد تعیین شده صحیح نمی باشد. لطفاً موقعیت دیگری را روی نقشه انتخاب کنید.' ), 'error' );
 			error_log( 'PWS error parsing JSON : ' . json_last_error_msg() );
 
 			return;
 		}
 
-		$map_location_exists = ! empty( $map_location['lat'] ) && ! empty( $map_location['long'] );
 
-		if ( $map_location_exists && ! $this->is_iran_location( $map_location['lat'], $map_location['long'] ) ) {
+		if ( ! $this->is_iran_location( $map_location['lat'], $map_location['long'] ) ) {
 			wc_add_notice( __( 'موقعیت مقصد خود را روی نقشه، در ایران ثبت کنید.' ), 'error' );
 
 			return;
@@ -417,7 +416,7 @@ class PWS_Map_Service {
 		$user_coords = $request->get_param( 'user_coords' );
 		$type        = $request->get_param( 'type' );
 
-		if ( empty( $user_coords ) || empty( $type ) ) {
+		if ( ! isset( $user_coords['lat'], $user_coords['long'] ) || empty( $type ) ) {
 			return new WP_REST_Response( [
 				'success' => false,
 				'message' => 'پارامترهای نامعتبر برای محاسبه فاصله'
@@ -468,7 +467,7 @@ class PWS_Map_Service {
 	public function calculate_direct_distance( array $user_coords ): string {
 		$store_coords = PWS()->get_option( 'map.store_location', '' );
 
-		if ( empty( $store_coords ) || empty( $user_coords ) ) {
+		if ( !isset( $store_coords['lat'], $store_coords['long'] ) || ! isset( $user_coords['lat'], $user_coords['long'] ) ) {
 			return '';
 		}
 

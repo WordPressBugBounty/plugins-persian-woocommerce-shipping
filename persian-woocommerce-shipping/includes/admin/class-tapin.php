@@ -28,10 +28,10 @@ class PWS_Settings_Tapin extends PWS_Settings {
 				'id'    => 'pws_tipax',
 				'title' => 'تیپاکس',
 			],
-//			[
-//				'id'    => 'pws_alonomic',
-//				'title' => 'الونومیک',
-//			],
+			[
+				'id'    => 'pws_alonomic',
+				'title' => 'الونومیک',
+			],
 		];
 	}
 
@@ -208,6 +208,19 @@ class PWS_Settings_Tapin extends PWS_Settings {
 						10 => 'تحویل در محل مشتری',
 						20 => 'تحویل در نمایندگی',
 					],
+				],
+			],
+			'pws_alonomic' => [
+				[
+					'name' => 'notes',
+					'desc' => sprintf( 'نکات:<ol>
+<li>سرویس الونومیک بسته‌های داخل کارتن پستی اندازه ۱ تا ۶ را حمل می‌کند.</li>
+<li>جمع‌آوری بسته‌ها از محل فروشگاه برای حداقل ۱۰ بسته انجام می‌شود.</li>
+<li>الونومیک سرویس‌های Same-Day و Next-Day با نرخ یکسان ارائه می‌کند.</li>
+<li>این سرویس صرفا ارسال به مناطق ۲۲ گانه شهر تهران را پشتیبانی می‌کند.</li>
+<li style="display: %s">این امکان فقط در <a href="%s" target="_blank">نسخه حرفه‌ای</a> فعال می‌باشد.</li>
+</ol>', defined( 'PWS_PRO_VERSION' ) ? 'none' : '', PWS()->pws_pro_url( 'tipax' ) ),
+					'type' => 'html',
 				],
 			],
 		];

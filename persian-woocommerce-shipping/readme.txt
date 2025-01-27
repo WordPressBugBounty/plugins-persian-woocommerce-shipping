@@ -5,7 +5,7 @@ Donate link: https://yun.ir/pws-pro?utm_source=donate
 Requires at least: 6.0.0
 Tested up to: 6.7.1
 Requires PHP: 7.4
-Stable tag: 4.2.1
+Stable tag: 4.2.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -101,6 +101,10 @@ Ask your questions in [Persian Woocommerce Shipping](https://nabik.net/contact/)
 6. Support Tapin dashboard
 
 == Changelog ==
+= 4.2.2 =
+* Fix: Some error in map service
+* Tapin: Update posteketab rates
+* Tapin: Set availability of special post
 = 4.2.1 =
 * Tapin: Add Tipax service
 * Tapin: Add special post service
