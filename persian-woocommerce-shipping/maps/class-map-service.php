@@ -5,13 +5,9 @@
  * @since 4.0.4
  */
 
-use Automattic\WooCommerce\Blocks\Package;
-use Automattic\WooCommerce\Internal\DataStores\Orders\OrdersTableDataStore;
-use Automattic\WooCommerce\Utilities\OrderUtil;
-
 defined( 'ABSPATH' ) || exit;
 
-class PWS_Map_Service {
+abstract class PWS_Map_Service {
 
 	/**
 	 * General
@@ -45,10 +41,9 @@ class PWS_Map_Service {
 	protected string $required_location;
 
 	public function __construct() {
-
 		// Set general options as class properties
-		$this->checkout_placement = PWS_Map::get_checkout_placement();
-		$this->required_location  = PWS_Map::required_location();
+		$this->checkout_placement = self::get_checkout_placement();
+		$this->required_location  = self::required_location();
 
 		$this->set_map_params( 'ORS_token', PWS()->get_option( 'map.ORS_token', true ) );
 		$this->set_map_params( 'is_admin', is_admin() );
@@ -60,12 +55,62 @@ class PWS_Map_Service {
 			$this->set_map_params( 'rest_url', rest_url( 'pws/map/' ) );
 		} );
 
+		add_action( 'woocommerce_cart_loaded_from_session', function () {
+			// Needs shipping works only with 'virtual' products.
+			$this->set_map_params( 'needs_shipping', WC()->cart->needs_shipping() );
+		} );
+
 		// Action and Filter WordPress Integration
-		$this->init_hooks();
+		add_action( 'init', [ $this, 'initialize_hooks' ] );
 
 	}
 
-	public function init_hooks() {
+	/**
+	 * Check if map is enabled and showing in checkout
+	 *
+	 * @return bool
+	 */
+	public static function is_enable(): bool {
+		return in_array( self::get_checkout_placement(), [ 'after_form', 'before_form' ] );
+	}
+
+	/**
+	 * Get the map placement in checkout form
+	 * Map feature is disabled by default
+	 *
+	 * @return string
+	 */
+	public static function get_checkout_placement(): string {
+
+		if ( is_a( WC()->cart, WC_Cart::class ) && ! WC()->cart->needs_shipping() ) {
+			return 'none';
+		}
+
+		return apply_filters( 'pws_map_checkout_placement', PWS()->get_option( 'map.checkout_placement', 'none' ) );
+	}
+
+	/**
+	 * Map should only load in this shipping methods
+	 * Contains a list of shipping methods
+	 *
+	 * @return array
+	 */
+	public static function enabled_shipping_methods(): array {
+		return apply_filters( 'pws_map_enabled_shipping_methods', PWS()->get_option( 'map.shipping_methods', [ 'all_shipping_methods' ] ) );
+	}
+
+	/**
+	 * Get the map location requirement status
+	 *
+	 * @return bool
+	 */
+	public static function required_location(): bool {
+		$is_location_required = PWS()->get_option( 'map.required_location', 1 ) == 1;
+
+		return apply_filters( 'pws_map_required_location', $is_location_required );
+	}
+
+	public function initialize_hooks() {
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 
@@ -87,8 +132,6 @@ class PWS_Map_Service {
 		add_filter( 'pws_map_user_marker_image', [ $this, 'user_marker_image' ] );
 		add_filter( 'pws_map_user_marker_color', [ $this, 'user_marker_color' ] );
 		add_filter( 'pws_map_store_marker_color', [ $this, 'store_marker_image' ] );
-		add_filter( 'pws_map_user_default_location', [ $this, 'user_default_location' ] );
-		add_filter( 'pws_map_store_default_location', [ $this, 'store_default_location' ] );
 
 		// Validate the location if its required
 		if ( $this->required_location ) {
@@ -101,19 +144,19 @@ class PWS_Map_Service {
 				case 'before_form':
 					$hook_names = [
 						'woocommerce_before_checkout_billing_form',
-						'woocommerce_before_checkout_shipping_form'
+						'woocommerce_before_checkout_shipping_form',
 					];
 					break;
 				case 'after_form':
 					$hook_names = [
 						'woocommerce_after_checkout_billing_form',
-						'woocommerce_after_checkout_shipping_form'
+						'woocommerce_after_checkout_shipping_form',
 					];
 					break;
 				default:
 					$hook_names = [
 						'woocommerce_after_checkout_billing_form',
-						'woocommerce_after_checkout_shipping_form'
+						'woocommerce_after_checkout_shipping_form',
 					];
 			}
 
@@ -156,53 +199,18 @@ class PWS_Map_Service {
 		return PWS_URL . 'assets/images/store-marker.png';
 	}
 
-	public function user_default_location( $input ) {
-		if ( ! empty( $input ) ) {
-			return $input;
-		}
-
-		return [ 'lat' => '35.6997006457524', 'long' => '51.33774439566025' ];
-	}
-
-	public function store_default_location( $input ) {
-		if ( ! empty( $input ) ) {
-			return $input;
-		}
-
-		return [ 'lat' => '35.6997006457524', 'long' => '51.33774439566025' ];
-	}
-
 	/**
 	 * General styles and scripts
+	 *
+	 * @param string $hook_suffix
+	 *
 	 * @return bool
 	 */
-	public function enqueue_scripts( $hook_suffix = '' ) {
-		global $post;
-
-		// Get the current screen, this method is only available in admin area
-		$screen = is_admin() ? get_current_screen() : null;
-
-		// Check if pws_map shortcode is executing in current post
-		$post_has_shortcode = is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'pws_map' );
-
-		// Check if it's the WooCommerce Orders admin page
-		// The is_admin() condition is already on $screen variable, so I won't repeat it here
-		$is_wc_orders_admin_page = ! empty( $screen ) && isset( $screen->id ) && ( $screen->id === 'shop_order' || $screen->id === 'woocommerce_page_wc-orders' );
-
-		// Check if it's the Checkout page
-		$is_checkout_page = ! is_admin() && function_exists( 'is_checkout' ) && is_checkout();
-
-		// Check if it's my account page
-		$is_my_account_page = is_account_page();
-
-		// Validate the project page
-		$is_valid_page = $this->is_admin_tools_page() || $is_wc_orders_admin_page || $is_checkout_page || $is_my_account_page || $post_has_shortcode;
-
+	public function enqueue_scripts( string $hook_suffix = '' ): bool {
 		// Return early if user is not on either of these pages
-		if ( ! $is_valid_page ) {
+		if ( ! PWS_Map::is_valid_page() ) {
 			return false;
 		}
-
 
 		wp_enqueue_script( 'pws-map-leaflet', PWS_URL . 'assets/maps/leaflet/leaflet.js', [], PWS_VERSION );
 
@@ -214,17 +222,14 @@ class PWS_Map_Service {
 
 	}
 
-	public function is_admin_tools_page() {
-		return is_admin() && isset( $_GET['page'] ) && $_GET['page'] == 'pws-tools';
-	}
-
 	/**
 	 * The map shortcode pure html
+	 *
+	 * @param array $atts
+	 *
 	 * @return string
 	 */
-	public function shortcode_callback( $atts ) {
-		return "<div class='pws-map__container'></div>";
-	}
+	abstract public function shortcode_callback( array $atts ): string;
 
 	/**
 	 * Create shortcode from the shortcode() template
@@ -327,7 +332,7 @@ class PWS_Map_Service {
 			'min_latitude'  => 25.078237,
 			'max_latitude'  => 39.777672,
 			'min_longitude' => 44.032688,
-			'max_longitude' => 63.322166
+			'max_longitude' => 63.322166,
 		];
 		/* Check if coordinates not in the area! */
 		$invalid_latitude  = $latitude < $iran_boundary['min_latitude'] || $latitude > $iran_boundary['max_latitude'];
@@ -347,8 +352,8 @@ class PWS_Map_Service {
 	 * @param $order WC_Order
 	 */
 	public function save_map_location_meta( $order ) {
-
 		// We need to fix json first, the JSON.stringify and input value will create html with special characters
+		// Without strip and converting to array, It'll save as 'string', Serialization won't work.
 		$map_location_json  = $_POST['pws_map_location'] ?? '';
 		$map_location_json  = stripslashes( $map_location_json );
 		$map_location_array = json_decode( $map_location_json, true );
@@ -363,6 +368,7 @@ class PWS_Map_Service {
 		if ( is_user_logged_in() ) {
 			update_user_meta( get_current_user_id(), 'pws_map_location', $map_location_array );
 		}
+
 	}
 
 	public function get_provider() {
@@ -403,7 +409,7 @@ class PWS_Map_Service {
 				],
 				'type'        => [
 					'required' => true,
-				]
+				],
 			],
 		] );
 
@@ -419,7 +425,7 @@ class PWS_Map_Service {
 		if ( ! isset( $user_coords['lat'], $user_coords['long'] ) || empty( $type ) ) {
 			return new WP_REST_Response( [
 				'success' => false,
-				'message' => 'پارامترهای نامعتبر برای محاسبه فاصله'
+				'message' => 'پارامترهای نامعتبر برای محاسبه فاصله',
 			], 400 );
 		}
 
@@ -467,7 +473,7 @@ class PWS_Map_Service {
 	public function calculate_direct_distance( array $user_coords ): string {
 		$store_coords = PWS()->get_option( 'map.store_location', '' );
 
-		if ( !isset( $store_coords['lat'], $store_coords['long'] ) || ! isset( $user_coords['lat'], $user_coords['long'] ) ) {
+		if ( ! isset( $store_coords['lat'], $store_coords['long'] ) || ! isset( $user_coords['lat'], $user_coords['long'] ) ) {
 			return '';
 		}
 
@@ -534,8 +540,8 @@ class PWS_Map_Service {
 		$body = [
 			'coordinates' => [
 				[ $user_lng, $user_lat ],
-				[ $store_lng, $store_lat ]
-			]
+				[ $store_lng, $store_lat ],
+			],
 		];
 
 		$args = [
@@ -543,7 +549,7 @@ class PWS_Map_Service {
 			'body'    => json_encode( $body ),
 			'headers' => [
 				'Content-Type'  => 'application/json',
-				'Authorization' => 'Bearer ' . $api_key
+				'Authorization' => 'Bearer ' . $api_key,
 			],
 		];
 

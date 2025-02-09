@@ -1,6 +1,5 @@
 (function ($) {
     $(document).ready(function () {
-
         // Find map containers
         var pws_map_containers = $('.pws-map__container');
         if (pws_map_containers.length === 0) {

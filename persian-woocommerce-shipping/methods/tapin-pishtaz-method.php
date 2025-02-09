@@ -55,6 +55,10 @@ class Tapin_Pishtaz_Method extends PWS_Tapin_Method {
 
 			$cost = $box_rates[ $weight_index ][ $box_size ][ $vicinity ];
 
+			if ( in_array( $args['to_city'], [ 1, 91, 61, 51, 71, 81, 31 ] ) ) {
+				$cost *= 1.15;
+			}
+
 		} else {
 
 			$box_rates    = include PWS_DIR . '/data/posteketab-rates.php';
@@ -67,6 +71,10 @@ class Tapin_Pishtaz_Method extends PWS_Tapin_Method {
 
 			$cost = $box_rates[ $weight_index ][ $box_size ];
 
+			if ( in_array( $box_size, range( 1, 3 ) ) && $weight >= 2650 ) {
+				$additions[] = 1.25;
+			}
+
 		}
 
 		if ( in_array( $box_size, range( 1, 3 ) ) ) {
@@ -78,10 +86,6 @@ class Tapin_Pishtaz_Method extends PWS_Tapin_Method {
 		}
 
 		$cost *= max( $additions );
-
-		if ( in_array( $args['to_city'], [ 1, 91, 61, 51, 71, 81, 31 ] ) ) {
-			$cost *= 1.15;
-		}
 
 		// INSURANCE
 		if ( $args['price'] >= 40000000 ) {

@@ -3,7 +3,7 @@
  * */
 
 /**
- * Return custom [lat,long] of iranian province
+ * Return custom [lat,long] of Iran provinces(states)
  * GENERAL METHOD
  * @return array
  * */
@@ -106,7 +106,6 @@ function pws_map_get_province_location(province) {
         default:
             return null;
     }
-
 }
 
 
@@ -187,6 +186,7 @@ function pws_map_after_checkout() {
     return pws_map_params.checkout_placement === 'after_form';
 }
 
+
 /**
  * Method to check if shipping state has been enabled
  * @return bool
@@ -195,6 +195,7 @@ function pws_checkout_shipping_address_enabled() {
     return jQuery('#ship-to-different-address-checkbox').is(':checked');
 }
 
+
 /**
  * Check if admin can edit and set new point on the map
  * */
@@ -202,16 +203,19 @@ function pws_map_admin_editing_enabled() {
     if (!pws_is_admin()) {
         return true;
     }
-    return jQuery('#pws-map-admin-edit').is(':checked');
 
+    return jQuery('#pws-map-admin-edit').is(':checked');
 }
+
 
 function pws_map_is_admin_tools_page() {
     let currentUrl = window.location.href;
+
     if (currentUrl.includes('?page=pws-tools')) {
         return true;
     }
 }
+
 
 function pws_map_get_order_id_from_url() {
     let url_params = new URLSearchParams(window.location.search);
@@ -229,42 +233,10 @@ function pws_map_get_order_id_from_url() {
 }
 
 
-function pws_map_convert_json_to_array(json) {
-    // Check if the input is an object
-    if (typeof json !== 'object' || json === null) {
-        console.error('Input is not a valid JSON object');
-        return [0, 0];
-    }
-
-    // Check if the object has 'lat' and 'long' keys
-    if (!json.hasOwnProperty('lat') || !json.hasOwnProperty('long')) {
-        console.error('JSON object does not have required keys: lat, long');
-        return [0, 0];
-    }
-
-    // Check if 'lat' and 'long' are numbers
-    if (typeof json.lat !== 'number' || typeof json.long !== 'number') {
-        console.error('Values of lat and long must be numbers');
-        return [0, 0];
-    }
-
-    // Convert to array
-    return [json.lat, json.long];
-}
-
-function pws_map_reverse_array(array) {
-    if (!Array.isArray(array) || array === undefined) {
-        return [0, 0];
-    }
-    return [...array.slice()].reverse();
-}
-
-
 /*
  * Function to add geolocate control and logic to map
  * TODO: Fix locate control
  */
-
 function pws_map_add_geolocate_control(map_object) {
     return false;
     L.control.locate({
@@ -277,6 +249,7 @@ function pws_map_add_geolocate_control(map_object) {
         }
     }).addTo(map_object);
 }
+
 
 // Function to add markers to the map
 function pws_map_add_marker(map_coords, icon_url, marker_layer_group) {
@@ -292,6 +265,7 @@ function pws_map_add_marker(map_coords, icon_url, marker_layer_group) {
     marker.addTo(marker_layer_group);
 }
 
+
 /**
  * Set map initial styles and customization
  * */
@@ -303,12 +277,12 @@ function pws_map_customize(container) {
     pws_map_style_tag.text(pws_map_css_customization);
     jQuery('head').append(pws_map_style_tag);
 
-
     container.css({
         'min-width': container.data('min-width'),
         'min-height': container.data('min-height')
     });
 }
+
 
 function pws_map_call_ajax(url, callback, headers) {
     jQuery.ajax({
@@ -344,15 +318,17 @@ function pws_show_location_data(lat, lng) {
 
 
 function pws_show_location_on_map(map_object, user_input_address, zoom, user_marker_layer) {
-    let province_cooords = pws_map_get_province_location(user_input_address);
-    if (province_cooords == null) {
+    let province_coords = pws_map_get_province_location(user_input_address);
+
+    if (province_coords == null) {
         return;
     }
-    map_object.setView(province_cooords, zoom);
+
+    map_object.setView(province_coords, zoom);
     jQuery("#pws_map_location").val('');
     user_marker_layer.clearLayers();
-
 }
+
 
 function pws_map_is_checkout() {
     let body = jQuery('body');
@@ -360,6 +336,7 @@ function pws_map_is_checkout() {
         !body.hasClass('woocommerce-order-received') &&
         !window.location.search.includes('order-pay')
 }
+
 
 /**
  * Interact with click on map
@@ -411,8 +388,8 @@ function pws_map_on_click(event, map_object, vars, user_marker_layer, store_mark
     if (pws_is_admin() && !is_admin_settings_editing) {
         pws_map_draw_route([vars.store_lat, vars.store_long], [clicked_lat, clicked_lng], vars, map_object);
     }
-
 }
+
 
 /**
  * Set data global variables
@@ -542,6 +519,7 @@ function pws_map_geolocation(map_object, vars, marker_layer) {
     });
 }
 
+
 /**
  * Init the store marker on the map
  * */
@@ -553,6 +531,7 @@ function pws_map_initialize_store_marker(marker_layer, vars) {
 
     pws_map_add_marker([vars.store_lat, vars.store_long], vars.store_marker_url, marker_layer);
 }
+
 
 /**
  * Init the user marker on the map
@@ -576,6 +555,39 @@ function pws_map_initialize_user_marker(marker_layer, vars, map_object) {
     if (pws_is_admin()) {
         pws_map_draw_route([vars.store_lat, vars.store_long], [vars.user_lat, vars.user_long], vars, map_object);
     }
+}
+
+
+/**
+ * Controls over hiding the map
+ * If map is hidden but location is required, It'll
+ */
+function pws_map_view_control(hide) {
+    let map_container = jQuery('.pws-map__container');
+    let required_location = jQuery('input[name="pws_map_required_location"]');
+
+    if (map_container.length === 0) {
+        return;
+    }
+
+    if (hide) {
+
+        map_container.hide();
+
+        if (required_location.length > 0) {
+            required_location.val('0');
+        }
+
+    } else {
+
+        map_container.show();
+
+        if (required_location.length > 0) {
+            required_location.val('1');
+        }
+
+    }
+
 }
 
 
@@ -660,6 +672,7 @@ function pws_map_zoom_on_province(map_object, marker_layer) {
     }
 }
 
+
 (function ($) {
     $(document).ready(function () {
         /**
@@ -672,6 +685,15 @@ function pws_map_zoom_on_province(map_object, marker_layer) {
                 $('.woocommerce-billing-fields').find('.pws-map__container').show();
             }
         });
+
+        /**
+         * Disables the map when virtual products exists in the Cart
+         * Using WC()->cart->needs_shipping() method
+         */
+        if (pws_map_is_checkout() && pws_map_params.needs_shipping !== "1") {
+            // Hide the map
+            pws_map_view_control(true);
+        }
 
         /**
          * Toggle alert admin about editing the map
@@ -709,39 +731,6 @@ function pws_map_zoom_on_province(map_object, marker_layer) {
                 return html.replace(/\s*\|\s*/g, '');
             });
         }
-
-        /**
-         * Controls over hiding the map
-         * If map is hidden but location is required, It'll
-         */
-        function pws_map_view_control(hide) {
-            let map_container = $('.pws-map__container');
-            let required_location = $('input[name="pws_map_required_location"]');
-
-            if (map_container.length === 0) {
-                return;
-            }
-
-            if (hide) {
-
-                map_container.hide();
-
-                if (required_location.length > 0) {
-                    required_location.val('0');
-                }
-
-            } else {
-
-                map_container.show();
-
-                if (required_location.length > 0) {
-                    required_location.val('1');
-                }
-
-            }
-
-        }
-
 
         // Controls over enabled shipping methods
         function pws_map_log_shipping_method(input_enabled_methods) {
@@ -812,5 +801,5 @@ function pws_map_zoom_on_province(map_object, marker_layer) {
                 pws_map_log_shipping_method(pws_map_enabled_shipping_methods);
             });
         }
-    })
+    });
 })(jQuery);

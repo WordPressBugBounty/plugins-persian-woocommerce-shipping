@@ -193,7 +193,7 @@ class PWS_Settings_Tools extends PWS_Settings {
 					'name'    => 'shipping_methods',
 					'default' => '',
 					'type'    => 'multiselect',
-					'options' => PWS()->get_shipping_methods(),
+					'options' => PWS_Map::get_all_shipping_methods(),
 					'desc'    => 'عدم انتخاب روش حمل و نقل به منزله نمایش نقشه در تمامی روش ها می‌باشد.',
 				],
 				[

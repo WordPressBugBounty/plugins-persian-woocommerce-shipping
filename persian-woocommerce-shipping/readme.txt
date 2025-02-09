@@ -5,7 +5,7 @@ Donate link: https://yun.ir/pws-pro?utm_source=donate
 Requires at least: 6.0.0
 Tested up to: 6.7.1
 Requires PHP: 7.4
-Stable tag: 4.2.2
+Stable tag: 4.2.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -101,6 +101,10 @@ Ask your questions in [Persian Woocommerce Shipping](https://nabik.net/contact/)
 6. Support Tapin dashboard
 
 == Changelog ==
+= 4.2.3 =
+* Tweak: Compatibility with woocommerce 9.6.1
+* Tapin: Update posteketab rates
+* Improve: Map feature design pattern
 = 4.2.2 =
 * Fix: Some error in map service
 * Tapin: Update posteketab rates

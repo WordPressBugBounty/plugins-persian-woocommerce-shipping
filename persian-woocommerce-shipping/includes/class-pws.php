@@ -74,9 +74,7 @@ class PWS_Core {
 	 * Hook into actions and filters.
 	 */
 	protected function init_hooks() {
-
-		$this->load_maps_init();
-		$this->state_city_taxonomy();
+        $this->state_city_taxonomy();
 
 		// Actions
 		add_action( 'wp_ajax_mahdiy_load_cities', [ PWS_Ajax::class, 'load_cities_callback' ] );
@@ -122,17 +120,6 @@ class PWS_Core {
 			'my_account_my_address_formatted_address',
 		], 10, 3 );
 		add_filter( 'woocommerce_checkout_get_value', [ $this, 'checkout_get_value' ], 10, 2 );
-	}
-
-	/**
-	 * Load the map engines
-	 * @since 4.0.4
-	 */
-	public function load_maps_init() {
-		require_once PWS_DIR . '/maps/class-map-service.php';
-		require_once PWS_DIR . '/maps/class-neshan.php';
-		require_once PWS_DIR . '/maps/class-mapp.php';
-		require_once PWS_DIR . '/maps/class-osm.php';
 	}
 
 	public function state_city_taxonomy() {
@@ -210,20 +197,20 @@ class PWS_Core {
 		}
 
 		?>
-        <tr valign="top">
-        <th scope="row" class="titledesc">
-            <label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
-        </th>
-        <td class="forminp">
-            <select name="<?php echo esc_attr( $value['id'] ); ?>"
-                    style="<?php echo esc_attr( $value['css'] ); ?>"
-                    data-placeholder="<?php esc_attr_e( 'Choose a country&hellip;', 'woocommerce' ); ?>"
-                    aria-label="<?php esc_attr_e( 'Country', 'woocommerce' ) ?>"
-                    class="wc-enhanced-select">
+		<tr valign="top">
+		<th scope="row" class="titledesc">
+			<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
+		</th>
+		<td class="forminp">
+			<select name="<?php echo esc_attr( $value['id'] ); ?>"
+					style="<?php echo esc_attr( $value['css'] ); ?>"
+					data-placeholder="<?php esc_attr_e( 'Choose a country&hellip;', 'woocommerce' ); ?>"
+					aria-label="<?php esc_attr_e( 'Country', 'woocommerce' ) ?>"
+					class="wc-enhanced-select">
 				<?php WC()->countries->country_dropdown_options( $country, $state ); ?>
-            </select>
-        </td>
-        </tr><?php
+			</select>
+		</td>
+		</tr><?php
 	}
 
 	public function enqueue_select2_scripts() {
@@ -1173,132 +1160,5 @@ class PWS_Core {
 	public function pws_pro_url( $source ): string {
 		return 'https://yun.ir/pws-pro?utm_source=' . esc_attr( $source );
 	}
-
-	public function get_all_shipping_zones(): array {
-		if ( ! empty( self::$all_shipping_zones ) ) {
-			return self::$all_shipping_zones;
-		}
-
-		$data_store = WC_Data_Store::load( 'shipping-zone' );
-
-		foreach ( $data_store->get_zones() as $raw_zone ) {
-			self::$all_shipping_zones[] = new WC_Shipping_Zone( $raw_zone );
-		}
-
-		self::$all_shipping_zones[] = new WC_Shipping_Zone( 0 );
-
-		return self::$all_shipping_zones;
-	}
-
-	public function get_shipping_methods(): array {
-		if ( ! empty( self::$all_shipping_methods ) ) {
-			return self::$all_shipping_methods;
-		}
-
-		foreach ( WC()->shipping()->load_shipping_methods() as $method ) {
-
-			self::$all_shipping_methods[ $method->id ] = sprintf( 'همه روش‌های "%s"', $method->get_method_title() );
-
-			foreach ( $this->get_all_shipping_zones() as $zone ) {
-
-				$shipping_method_instances = $zone->get_shipping_methods();
-
-				foreach ( $shipping_method_instances as $shipping_method_instance_id => $shipping_method_instance ) {
-
-					if ( $shipping_method_instance->id !== $method->id ) {
-						continue;
-					}
-
-					$option_id = $shipping_method_instance->get_rate_id();
-
-					$option_instance_title = sprintf( '%1$s (#%2$s)', $shipping_method_instance->get_title(), $shipping_method_instance_id );
-
-					$option_title = sprintf( '%1$s - %2$s', $zone->get_id() ? $zone->get_zone_name() : __( 'Other locations', 'woocommerce' ), $option_instance_title );
-
-					self::$all_shipping_methods[ $option_id ] = $option_title;
-				}
-			}
-		}
-
-		return self::$all_shipping_methods;
-	}
-
-
-	/**
-	 * Get the map direction share link based on $order data
-	 *
-	 * @param WC_Order $order
-	 *
-	 * @return string
-	 */
-	public function get_order_map_share_link( WC_Order $order ): string {
-		$location = $this->get_map_order_location( $order );
-
-		if ( ! isset( $location['lat'], $location['long'] ) ) {
-			return '';
-		}
-
-		return $this->get_map_share_link( $location['lat'], $location['long'] );
-	}
-
-	/**
-	 * Get location from order
-	 *
-	 * @param WC_Order $order
-	 * @param mixed $default
-	 *
-	 * @return array|mixed
-	 */
-	public function get_map_order_location( WC_Order $order, $default = null ) {
-		$location = $order->get_meta( 'pws_map_location' );
-
-		if ( ! isset( $location['lat'], $location['long'] ) ) {
-			return $default;
-		}
-
-		return $location;
-
-	}
-
-	/**
-	 * Creates link of map to share as sms or qrcode ,...
-	 *
-	 * @param float $lat
-	 * @param float $long
-	 * @param string $type The map type
-	 *
-	 * @return string
-	 */
-	public function get_map_share_link( $lat, $long, string $type = 'neshan' ): string {
-		// Set store location
-		$store_location = PWS()->get_option( 'map.store_location', '{"lat":"35.6997006457524","long":"51.33774439566025"}' );
-		$store_location = json_decode( $store_location, true );
-		$store_lat      = $store_location['lat'] ?? '35.6997006457524';
-		$store_long     = $store_location['long'] ?? '51.33774439566025';
-		$url            = '';
-
-		// Check if latitude and longitude are invalid
-		if ( ! isset( $lat, $long ) || ! is_numeric( $lat ) || ! is_numeric( $long ) ) {
-			$lat  = $store_lat;
-			$long = $store_long;
-		}
-
-		switch ( $type ) {
-			case 'neshan' :
-				$url = "https://neshan.org/maps/routing/car/origin/$store_lat,$store_long/destination/$lat,$long";
-				break;
-			case 'balad':
-				$url = "https://balad.ir/directions/driving?origin=$store_long,$store_lat&destination=$long,$lat";
-				break;
-			case 'google':
-				$url = "https://www.google.com/maps/dir/$store_lat,$store_long/$lat,$long";
-				break;
-			case 'default' :
-				$url = "https://neshan.org/maps/routing/car/origin/$store_lat,$store_long/destination/$lat,$long";
-		}
-
-		return $url;
-	}
-
 
 }
