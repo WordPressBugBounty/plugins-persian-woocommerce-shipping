@@ -74,7 +74,7 @@ class PWS_Core {
 	 * Hook into actions and filters.
 	 */
 	protected function init_hooks() {
-        $this->state_city_taxonomy();
+		$this->state_city_taxonomy();
 
 		// Actions
 		add_action( 'wp_ajax_mahdiy_load_cities', [ PWS_Ajax::class, 'load_cities_callback' ] );

@@ -177,12 +177,13 @@ class PWS_Shipping_Method extends WC_Shipping_Method {
 		return false;
 	}
 
-	public function add_rate_cost( $cost, $package ) {
+	public function add_rate_cost( $cost, $package, $meta_data = [] ) {
 
 		$rate = apply_filters( 'pws_add_rate', [
-			'id'    => $this->get_rate_id(),
-			'label' => $this->title,
-			'cost'  => $cost,
+			'id'        => $this->get_rate_id(),
+			'label'     => $this->title,
+			'cost'      => $cost,
+			'meta_data' => $meta_data,
 		], $package, $this );
 
 		$rate['cost'] = max( $rate['cost'], 0 );

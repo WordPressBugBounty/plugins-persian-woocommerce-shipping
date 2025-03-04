@@ -95,7 +95,7 @@ abstract class PWS_Map_Service {
 	 *
 	 * @return array
 	 */
-	public static function enabled_shipping_methods(): array {
+	public static function get_enabled_shipping_methods(): array {
 		return apply_filters( 'pws_map_enabled_shipping_methods', PWS()->get_option( 'map.shipping_methods', [ 'all_shipping_methods' ] ) );
 	}
 
@@ -185,9 +185,7 @@ abstract class PWS_Map_Service {
 
 		return '#FF8330';
 	}
-	/**
-	 * Callback for pws_user_marker_co
-	 */
+
 	/**
 	 * Callback for pws_store_marker_filter to pass custom icon as store marker
 	 */
@@ -225,11 +223,177 @@ abstract class PWS_Map_Service {
 	/**
 	 * The map shortcode pure html
 	 *
-	 * @param array $atts
+	 * @param array $atts Shortcode attributes
 	 *
 	 * @return string
 	 */
-	abstract public function shortcode_callback( array $atts ): string;
+	public function shortcode_callback( array $atts ): string {
+		$store_marker_enable = PWS()->get_option( 'map.store_marker_enable', true );
+
+		[ $store_lat, $store_long ] = PWS_Map::get_default_location_array();
+
+		if ( is_admin() || $store_marker_enable ) {
+			[ $store_lat, $store_long ] = PWS_Map::get_store_location();
+		}
+
+		$center_lat  = $store_lat;
+		$center_long = $store_long;
+
+		$store_marker_image    = apply_filters( 'pws_map_store_marker_image', PWS_URL . 'assets/images/store-marker.png' );
+		$store_marker_color    = apply_filters( 'pws_map_store_marker_color', '#6678FF' );
+		$store_draw_line_color = apply_filters( 'pws_map_store_draw_line_color', '#00FF00' );
+
+		$show_distance_type = PWS()->get_option( 'map.store_calculate_distance', 'none' );
+		$user_marker_image  = apply_filters( 'pws_map_user_marker_image', PWS_URL . 'assets/images/map-marker.png' );
+		$user_marker_color  = apply_filters( 'pws_map_user_marker_color', '#FF8330' );
+		$user_has_location  = false;
+		$required_location  = PWS()->get_option( 'map.required_location', true );
+		$map_location       = [];
+
+		if ( is_user_logged_in() && ! PWS_Map::is_admin_tools_page() ) {
+			$map_location = PWS_Map::get_user_location();
+		}
+
+		if ( isset( $map_location['lat'], $map_location['long'] ) ) {
+			$center_lat        = $map_location['lat'];
+			$center_long       = $map_location['long'];
+			$user_has_location = true;
+		}
+
+		// Define shortcode attributes with default values
+		$atts = shortcode_atts( [
+			'min-width'             => '400px',
+			'min-height'            => '400px',
+			'width'                 => '100%',
+			'height'                => '400px',
+			'zoom'                  => '12',
+			'editable'              => false,
+			'user-marker-color'     => $user_marker_color,
+			'store-marker-color'    => $store_marker_color,
+			'center-lat'            => $center_lat,
+			'center-long'           => $center_long,
+			'store-lat'             => $store_lat,
+			'store-long'            => $store_long,
+			'user-has-location'     => $user_has_location,
+			'user-marker-url'       => $user_marker_image,
+			'store-marker-url'      => $store_marker_image,
+			'show-distance-type'    => $show_distance_type,
+			'store-draw-line-color' => $store_draw_line_color,
+			'poi'                   => true,
+			'traffic'               => false,
+			'type'                  => 'vector',
+		], $atts, 'pws_map' );
+
+		// No enabled shipping method? Then map always loads in all shipping methods
+		$enabled_shipping_methods = PWS_Map_Service::get_enabled_shipping_methods();
+		$enabled_shipping_methods = wp_json_encode( $enabled_shipping_methods, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+
+		// Add dynamic parts that are specific to the map type
+		$generated_id = rand( 0, 300 );
+		$map_name     = $this->get_current_map_name();
+		$map_class    = "pws-map__" . $map_name;
+		$map_id       = "pws-map-" . $map_name . "-container-" . $generated_id;
+		$extra_html   = $this->get_extra_html();
+
+		return sprintf(
+			'<div class="pws-map__container %s"
+					    id="%s"
+					    style="width: %s; height: %s;"
+					    data-min-width="%s" 
+					    data-min-height="%s"  
+					    data-zoom="%s"
+					    data-type="%s"
+					    data-editable="%s"
+					    data-user-has-location="%s"
+					    data-center-lat="%s"
+					    data-center-long="%s"
+					    data-store-lat="%s"
+					    data-store-long="%s"
+					    data-user-marker-url="%s"
+					    data-user-marker-color="%s"
+					    data-store-marker-url="%s"
+					    data-store-marker-color="%s"
+					    data-store-marker-enable="%s"
+					    data-store-draw-line-color="%s"
+					    data-show-distance-type="%s"
+					    data-poi="%s"
+					    data-traffic="%s" >
+					    %s
+					    <input type="hidden" value="%s" name="pws_map_enabled_shipping_methods">
+					    <input type="hidden" value="%s" name="pws_map_required_location">
+					</div>',
+			$map_class,
+			$map_id,
+			$this->sanitize_size( $atts['width'] ),
+			$this->sanitize_size( $atts['height'] ),
+			$this->sanitize_size( $atts['min-width'] ),
+			$this->sanitize_size( $atts['min-height'] ),
+			intval( $atts['zoom'] ),
+			esc_attr( $atts['type'] ),
+			filter_var( $atts['editable'], FILTER_VALIDATE_BOOLEAN ),
+			filter_var( $atts['user-has-location'], FILTER_VALIDATE_BOOLEAN ),
+			floatval( $atts['center-lat'] ),
+			floatval( $atts['center-long'] ),
+			floatval( $atts['store-lat'] ),
+			floatval( $atts['store-long'] ),
+			esc_url( $atts['user-marker-url'] ),
+			sanitize_hex_color( $atts['user-marker-color'] ),
+			esc_url( $atts['store-marker-url'] ),
+			sanitize_hex_color( $atts['store-marker-color'] ),
+			$store_marker_enable,
+			sanitize_hex_color( $atts['store-draw-line-color'] ),
+			$show_distance_type,
+			filter_var( $atts['poi'], FILTER_VALIDATE_BOOLEAN ),
+			filter_var( $atts['traffic'], FILTER_VALIDATE_BOOLEAN ),
+			$extra_html,
+			$enabled_shipping_methods,
+			$required_location
+		);
+
+
+	}
+
+	/**
+	 * Get map name based on it's class (Inheriting from this class)
+	 * Converts PWS_Map_OSM to OSM
+	 * Converts PWS_Map_Neshan to neshan
+	 *
+	 * @return string
+	 */
+	public function get_current_map_name(): string {
+		$map_name = get_called_class();
+
+		if ( ! str_contains( $map_name, 'PWS_Map_' ) ) {
+			return $map_name;
+		}
+
+		$map_name = str_replace( 'PWS_Map_', '', $map_name );
+
+		return ctype_upper( $map_name ) ? $map_name : strtolower( $map_name );
+	}
+
+
+	/**
+	 * Sanitize digits with measuring units like px or %
+	 *
+	 * @param string $value
+	 *
+	 * @return string
+	 */
+	public function sanitize_size( string $value ): string {
+		$unit = str_contains( $value, 'px' ) ? 'px' : '%';
+
+		return intval( $value ) . $unit;
+	}
+
+	/**
+	 * Set extra html in map container
+	 *
+	 * @return string
+	 */
+	public function get_extra_html(): string {
+		return '';
+	}
 
 	/**
 	 * Create shortcode from the shortcode() template

@@ -71,6 +71,21 @@ class PWS_Order {
 		return $shipping_method;
 	}
 
+	public static function get_shipping_payment_type( WC_Order $order ): string {
+
+		$payment_type = 'prepaid';
+
+		foreach ( $order->get_shipping_methods() as $shipping_item ) {
+
+			if ( $shipping_item->get_meta( 'payment_type' ) == 'postpaid' ) {
+				$payment_type = 'postpaid';
+			}
+
+		}
+
+		return $payment_type;
+	}
+
 	public static function get_content_type( WC_Order $order ) {
 
 		$content_type = $order->get_meta( 'tapin_content_type' );

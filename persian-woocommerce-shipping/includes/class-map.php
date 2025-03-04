@@ -34,6 +34,11 @@ class PWS_Map {
 	}
 
 	public function initialize() {
+		// Disable whole map option, even pws_map shortcode
+		if ( PWS_Map_Service::get_checkout_placement() == 'none' ) {
+			return;
+		}
+
 		// Action hooks for admin
 		add_action( 'add_meta_boxes', [ $this, 'add_order_meta_box' ], 100 );
 		add_action( 'woocommerce_admin_order_data_after_billing_address', [ $this, 'add_location_field_to_order_form', ], 100 );
@@ -165,11 +170,19 @@ class PWS_Map {
 	 * @return array
 	 */
 	public static function get_store_location(): array {
-		$default_location = self::get_default_location_json();
-		$store_location   = PWS()->get_option( 'map.store_location', $default_location );
-		$store_location   = json_decode( $store_location, true );
+		$default_location_json  = self::get_default_location_json();
+		$default_location_array = self::get_default_location_assoc_array();
 
-		return [ $store_location['lat'], $store_location['long'] ];
+		$store_location = PWS()->get_option( 'map.store_location', $default_location_json );
+		$store_location = json_decode( $store_location, true );
+
+		if ( json_last_error() || ! isset( $store_location['lat'], $store_location['long'] ) ) {
+			$store_location_array = [ $default_location_array['lat'], $default_location_array['long'] ];
+		} else {
+			$store_location_array = [ $store_location['lat'], $store_location['long'] ];
+		}
+
+		return $store_location_array;
 	}
 
 	/**
@@ -223,15 +236,19 @@ class PWS_Map {
 	/**
 	 * Creates link of map to share as sms or qrcode ,...
 	 *
-	 * @param float $lat
-	 * @param float $long
+	 * @param float|null $lat
+	 * @param float|null $long
 	 * @param string $type The map type
 	 *
 	 * @return string
 	 */
-	public static function get_share_link( float $lat, float $long, string $type = 'neshan' ): string {
+	public static function get_share_link( ?float $lat, ?float $long, string $type = 'neshan' ): string {
 
 		[ $store_lat, $store_long ] = self::get_store_location();
+
+		if ( is_null( $lat ) || is_null( $long ) ) {
+			[ $lat, $long ] = [ $store_lat, $store_long ];
+		}
 
 		switch ( $type ) {
 			case 'neshan' :
@@ -255,18 +272,18 @@ class PWS_Map {
 	 * Get location from order
 	 *
 	 * @param WC_Order $order
-	 * @param mixed $default
+	 * @param array|null $default
 	 *
-	 * @return array|mixed
+	 * @return array
 	 */
-	public static function get_order_location( WC_Order $order, $default = null ) {
+	public static function get_order_location( WC_Order $order, array $default = null ): array {
 		$location = $order->get_meta( 'pws_map_location' );
 
 		if ( ! isset( $location['lat'], $location['long'] ) ) {
 			return $default;
 		}
 
-		return [ $location['lat'], $location['long'] ];
+		return [ (float) $location['lat'], (float) $location['long'] ];
 	}
 
 	/**
@@ -367,10 +384,10 @@ class PWS_Map {
 
 		$map = do_shortcode( "[pws_map center-lat='$center_lat' center-long='$center_long' min-width='200px' min-height='200px']" );
 
-		$neshan_share_link = $this->get_share_link( $center_lat, $center_long );
+		$neshan_share_link = self::get_share_link( $center_lat, $center_long );
 		$neshan_logo_link  = PWS_URL . 'assets/images/neshan.png';
 
-		$balad_share_link = $this->get_share_link( $center_lat, $center_long, 'balad' );
+		$balad_share_link = self::get_share_link( $center_lat, $center_long, 'balad' );
 		$balad_logo_link  = PWS_URL . 'assets/images/balad.png';
 
 		echo <<<ORDER_MAP_SECTION

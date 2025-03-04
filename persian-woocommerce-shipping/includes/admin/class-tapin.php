@@ -78,7 +78,7 @@ class PWS_Settings_Tapin extends PWS_Settings {
 		}
 
 		return [
-			'pws_tapin' => [
+			'pws_tapin'    => [
 				[
 					'name' => 'banner',
 					'desc' => '<a href="https://yun.ir/pwstd" target="_blank"><img src="' . PWS_URL . 'assets/images/tapin.jpg" style="width: 100%;"></a>',
@@ -178,11 +178,11 @@ class PWS_Settings_Tapin extends PWS_Settings {
 					'type' => 'html',
 				],
 			],
-			'pws_tipax' => [
+			'pws_tipax'    => [
 				[
 					'name' => 'notes',
 					'desc' => sprintf( 'نکات:<ol>
-<li>سرویس تیپاکس در حال حاضر بسته‌های بین ۱ تا ۶ کیلوگرم را می‌پذیرد.</li>
+<li>سرویس تیپاکس در حال حاضر بسته‌های بین ۱ تا ۱۵ کیلوگرم را می‌پذیرد.</li>
 <li>نمایندگی‌های دریافت سفارش‌ها در لینک روبرو قابل مشاهده هستند: https://map.tapin.ir/accept-tipax</li>
 <li style="display: %s">این امکان فقط در <a href="%s" target="_blank">نسخه حرفه‌ای</a> فعال می‌باشد.</li>
 </ol>', defined( 'PWS_PRO_VERSION' ) ? 'none' : '', PWS()->pws_pro_url( 'tipax' ) ),
