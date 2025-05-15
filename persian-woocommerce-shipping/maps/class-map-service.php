@@ -111,6 +111,7 @@ abstract class PWS_Map_Service {
 	}
 
 	public function initialize_hooks() {
+
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 
@@ -120,12 +121,14 @@ abstract class PWS_Map_Service {
 		// Enable shortcode as [pws_map]
 		add_action( 'init', [ $this, 'add_map_shortcode' ], 100 );
 
-		// Add hidden inputs to the checkout form
-		add_filter( 'woocommerce_checkout_fields', [ $this, 'add_map_location_field_to_checkout_form' ], 100 );
-		add_filter( 'woocommerce_checkout_get_value', [ $this, 'disable_map_location_field_get_value' ], 101, 2 );
+		if ( $this->checkout_placement !== 'none' ) {
+			// Add hidden inputs to the checkout form
+			add_filter( 'woocommerce_checkout_fields', [ $this, 'add_map_location_field_to_checkout_form' ], 100 );
+			add_filter( 'woocommerce_checkout_get_value', [ $this, 'disable_map_location_field_get_value' ], 101, 2 );
 
-		// Save the location order meta
-		add_action( 'woocommerce_checkout_create_order', [ $this, 'save_map_location_meta' ], 100 );
+			// Save the location order meta
+			add_action( 'woocommerce_checkout_create_order', [ $this, 'save_map_location_meta' ], 100 );
+		}
 
 		// Filters for customization
 		add_filter( 'pws_map_store_marker_image', [ $this, 'store_marker_image' ] );

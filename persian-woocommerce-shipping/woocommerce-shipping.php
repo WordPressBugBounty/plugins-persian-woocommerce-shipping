@@ -3,18 +3,18 @@
  * Plugin Name: افزونه حمل و نقل ووکامرس
  * Plugin URI: http://MahdiY.ir
  * Description: افزونه قدرتمند حمل و نقل ووکامرس با قابلیت ارسال از طریق پست پیشتاز، پیک موتوری و تیپاکس
- * Version: 4.2.4
+ * Version: 4.2.5
  * Author: Mahdi Yousefi [MahdiY]
  * Author URI: http://MahdiY.ir
  * Requires Plugins: woocommerce
  * WC requires at least: 7.0.0
- * WC tested up to: 9.7.0
+ * WC tested up to: 9.8.4
  */
 
 defined( 'ABSPATH' ) || exit;
 
 if ( ! defined( 'PWS_VERSION' ) ) {
-	define( 'PWS_VERSION', '4.2.4' );
+	define( 'PWS_VERSION', '4.2.5' );
 }
 
 if ( ! defined( 'PWS_DIR' ) ) {
@@ -64,6 +64,6 @@ register_activation_hook( PWS_FILE, function () {
 
 add_action( 'before_woocommerce_init', function () {
 	if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
-		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__ );
 	}
 } );

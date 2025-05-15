@@ -29,6 +29,15 @@ class Tapin_Special_Method extends PWS_Tapin_Method {
 		parent::__construct();
 	}
 
+	public function supports( $feature ) {
+
+		if ( $feature == 'postpaid' ) {
+			return true;
+		}
+
+		return parent::supports( $feature );
+	}
+
 	public function is_available( $package = [] ): bool {
 
 		$city_id = intval( $package['destination']['city'] );
@@ -81,7 +90,7 @@ class Tapin_Special_Method extends PWS_Tapin_Method {
 		}
 
 		// INSURANCE
-		if ( $args['price'] >= 40000000 ) {
+		if ( $args['price'] >= 50_000_000 ) {
 
 			switch ( true ) {
 				case $args['price'] >= 700000000:
@@ -101,24 +110,24 @@ class Tapin_Special_Method extends PWS_Tapin_Method {
 			$cost += $args['price'] * $rate;
 
 		} else {
-			$cost += 40000;
+			$cost += 50_000;
 		}
 
 		// COD
 		if ( $args['is_cod'] ) {
 
 			switch ( true ) {
-				case $args['price'] >= 200000000:
-					$cost += 120000;
+				case $args['price'] >= 200_000_000:
+					$cost += 150_000;
 					break;
-				case $args['price'] >= 50000000:
-					$cost += 90000;
+				case $args['price'] >= 50_000_000:
+					$cost += 120_000;
 					break;
-				case $args['price'] >= 10000000:
-					$cost += 80000;
+				case $args['price'] >= 10_000_000:
+					$cost += 100_000;
 					break;
-				case $args['price'] >= 5000000:
-					$cost += 70000;
+				case $args['price'] >= 5_000_000:
+					$cost += 90_000;
 					break;
 				default:
 					$cost += $args['price'] * 0.01;

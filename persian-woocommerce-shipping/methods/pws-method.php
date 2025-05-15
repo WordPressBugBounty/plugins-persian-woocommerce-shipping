@@ -186,7 +186,8 @@ class PWS_Shipping_Method extends WC_Shipping_Method {
 			'meta_data' => $meta_data,
 		], $package, $this );
 
-		$rate['cost'] = max( $rate['cost'], 0 );
+		$rate['label'] = str_replace( ' - تاپین', '', $rate['label'] );
+		$rate['cost']  = max( $rate['cost'], 0 );
 
 		$this->add_rate( $rate );
 	}

@@ -304,7 +304,6 @@ class PWS_Status {
 					<option value="1" <?php selected( 1, $content_type ); ?>>عادی</option>
 					<option value="2" <?php selected( 2, $content_type ); ?>>شکستنی</option>
 					<option value="3" <?php selected( 3, $content_type ); ?>>مایعات</option>
-					<option value="4" <?php selected( 4, $content_type ); ?>>غیراستاندارد</option>
 				</select>
 			</p>
 
@@ -354,7 +353,6 @@ class PWS_Status {
 					<option value="1" <?php selected( 1, $content_type ); ?>>عادی</option>
 					<option value="2" <?php selected( 2, $content_type ); ?>>شکستنی</option>
 					<option value="3" <?php selected( 3, $content_type ); ?>>مایعات</option>
-					<option value="4" <?php selected( 4, $content_type ); ?>>غیراستاندارد</option>
 				</select>
 			</p>
 
@@ -495,7 +493,7 @@ class PWS_Status {
 			$tapin_content_type = PWS_Order::get_content_type( $order );
 			$tapin_box_size     = PWS_Order::get_box_size( $order );
 
-			$tapin_pay_type = 1;
+			$tapin_pay_type = PWS_Order::get_shipping_payment_type( $order ) == 'postpaid' ? 2 : 1;
 
 			if ( $order->get_payment_method() == 'cod' ) {
 				$tapin_pay_type = 3;

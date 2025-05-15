@@ -61,6 +61,12 @@ class PWS_Admin {
 				'slug'       => 'admin.php?page=wc-settings&tab=shipping&section=pws_rules',
 				'callback'   => '',
 			],
+			60 => [
+				'title'      => 'زودپک',
+				'capability' => $capability,
+				'slug'       => 'https://l.nabik.net/zoodpack',
+				'callback'   => '',
+			],
 		];
 
 		if ( ! defined( 'PWS_PRO_VERSION' ) ) {
@@ -91,7 +97,12 @@ class PWS_Admin {
 		?>
 		<script type="text/javascript">
             jQuery(document).ready(function ($) {
-                $("ul#adminmenu a[href*='yun.ir/pws-pro']").attr('target', '_blank');
+                $("a[href*='l.nabik.net']").attr('target', '_blank');
+
+                $("a[href*='l.nabik.net/zoodpack']").html(`
+                	<img src="<?php echo PWS_URL . 'assets/images/zoodpack.png'; ?>"
+                	style="display: inline; height: 12px;position: relative;top: 2px;" /> زودپک
+                `);
             });
 		</script>
 		<?php
@@ -102,9 +113,10 @@ class PWS_Admin {
 	 */
 	public function admin_scripts( $hook_suffix ) {
 
-		if (! in_array( $hook_suffix, [ 'toplevel_page_pws-tools', 'woocommerce_page_wc-orders' ] ) ) {
+		if ( ! in_array( $hook_suffix, [ 'toplevel_page_pws-tools', 'woocommerce_page_wc-orders' ] ) ) {
 			return;
 		}
+
 		wp_enqueue_style(
 			'pws-tools-submenu-css',
 			PWS_URL . 'assets/css/admin.css',

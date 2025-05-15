@@ -115,14 +115,13 @@ class PWS_Settings_Tapin extends PWS_Settings {
 				[
 					'label'   => 'نوع مرسوله پیشفرض',
 					'name'    => 'content_type',
-					'default' => 4,
+					'default' => 1,
 					'type'    => 'select',
 					'desc'    => 'بسته‌های تاپین به صورت پیشفرض با این نوع ثبت می‌شوند. (در بخش ویرایش سفارش، برای هر سفارش قابل تغییر و شخصی سازی است)',
 					'options' => [
 						1 => 'عادی',
 						2 => 'شکستنی',
 						3 => 'مایعات',
-						4 => 'غیراستاندارد',
 					],
 				],
 				[
@@ -183,6 +182,7 @@ class PWS_Settings_Tapin extends PWS_Settings {
 					'name' => 'notes',
 					'desc' => sprintf( 'نکات:<ol>
 <li>سرویس تیپاکس در حال حاضر بسته‌های بین ۱ تا ۱۵ کیلوگرم را می‌پذیرد.</li>
+<li>سرویس تیپاکس بسته‌های به ارزش ۴۰۰ هزار تا حداکثر ۶۰ میلیون تومان را می‌پذیرد.</li>
 <li>نمایندگی‌های دریافت سفارش‌ها در لینک روبرو قابل مشاهده هستند: https://map.tapin.ir/accept-tipax</li>
 <li style="display: %s">این امکان فقط در <a href="%s" target="_blank">نسخه حرفه‌ای</a> فعال می‌باشد.</li>
 </ol>', defined( 'PWS_PRO_VERSION' ) ? 'none' : '', PWS()->pws_pro_url( 'tipax' ) ),

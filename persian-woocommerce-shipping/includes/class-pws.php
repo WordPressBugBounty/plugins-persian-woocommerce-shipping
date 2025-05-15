@@ -1158,7 +1158,7 @@ class PWS_Core {
 	}
 
 	public function pws_pro_url( $source ): string {
-		return 'https://yun.ir/pws-pro?utm_source=' . esc_attr( $source );
+		return 'https://l.nabik.net/pws-pro?utm_source=' . esc_attr( $source );
 	}
 
 }

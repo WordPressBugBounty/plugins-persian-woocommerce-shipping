@@ -135,7 +135,7 @@ class PWS_Tapin_Method extends PWS_Shipping_Method {
 			'from_province' => intval( $shop->province_code ?? 1 ),
 			'to_city'       => intval( $destination['city'] ),
 			'from_city'     => intval( $shop->city_code ?? 1 ),
-			'content_type'  => PWS()->get_option( 'tapin.content_type', 4 ),
+			'content_type'  => PWS()->get_option( 'tapin.content_type', 1 ),
 			'box_size'      => PWS()->get_option( 'tapin.box_size', 1 ),
 		];
 

@@ -91,7 +91,7 @@ class PWS_Order {
 		$content_type = $order->get_meta( 'tapin_content_type' );
 
 		if ( empty( $content_type ) ) {
-			$content_type = PWS()->get_option( 'tapin.content_type', 4 );
+			$content_type = PWS()->get_option( 'tapin.content_type', 1 );
 		}
 
 		return $content_type;

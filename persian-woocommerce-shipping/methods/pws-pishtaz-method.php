@@ -17,7 +17,7 @@ class WC_Forehand_Method extends PWS_Shipping_Method {
 
 	const SERVICE = 16000;
 
-	const TAX = 9;
+	const TAX = 10;
 
 	public function __construct( $instance_id = 0 ) {
 

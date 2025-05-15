@@ -24,26 +24,21 @@ class PWS_Map {
 
 	public static bool $initialize;
 
+
 	public function __construct() {
-
 		$this->load_engines();
-
 		$this->initialize();
-
-
 	}
 
 	public function initialize() {
-		// Disable whole map option, even pws_map shortcode
-		if ( PWS_Map_Service::get_checkout_placement() == 'none' ) {
-			return;
-		}
 
-		// Action hooks for admin
-		add_action( 'add_meta_boxes', [ $this, 'add_order_meta_box' ], 100 );
-		add_action( 'woocommerce_admin_order_data_after_billing_address', [ $this, 'add_location_field_to_order_form', ], 100 );
-		add_action( 'woocommerce_process_shop_order_meta', [ $this, 'save_location_order_meta' ], 100 );
-		add_action( 'woocommerce_order_details_after_customer_details', [ $this, 'my_account_show_callback' ], 100 );
+		if ( PWS_Map_Service::get_checkout_placement() !== 'none' ) {
+			// Action hooks for admin and woocommerce
+			add_action( 'add_meta_boxes', [ $this, 'add_order_meta_box' ], 100 );
+			add_action( 'woocommerce_admin_order_data_after_billing_address', [ $this, 'add_location_field_to_order_form', ], 100 );
+			add_action( 'woocommerce_process_shop_order_meta', [ $this, 'save_location_order_meta' ], 100 );
+			add_action( 'woocommerce_order_details_after_customer_details', [ $this, 'my_account_show_callback' ], 100 );
+		}
 
 		// Set active map
 		$provider = PWS()->get_option( 'map.provider', 'OSM' );
@@ -74,13 +69,11 @@ class PWS_Map {
 	}
 
 	public static function is_valid_page(): bool {
-		global $post;
-
 		// Get the current screen, this method is only available in admin area
 		$screen_id = is_admin() ? get_current_screen()->id : null;
 
 		// Check if pws_map shortcode is executing in current post
-		$post_has_shortcode = is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'pws_map' );
+		$post_has_shortcode = self::post_has_shortcode();
 
 		// Check if it's the WooCommerce Orders admin page
 		// The is_admin() condition is already on $screen variable, so I won't repeat it here
@@ -94,6 +87,17 @@ class PWS_Map {
 
 		// Validate the project page
 		return PWS_Map::is_admin_tools_page() || $is_wc_orders_admin_page || $is_checkout_page || $is_my_account_page || $post_has_shortcode;
+	}
+
+	/**
+	 * Check if pws_map shortcode is presenting in current post
+	 *
+	 * @return bool
+	 */
+	public static function post_has_shortcode(): bool {
+		global $post;
+
+		return is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'pws_map' );
 	}
 
 
@@ -434,8 +438,6 @@ class PWS_Map {
 		[ $center_lat, $center_long ] = self::get_order_location( $order );
 
 		if ( empty( $center_lat ) || empty( $center_long ) ) {
-			echo 'مختصات ارسال سفارش ثبت نشده.';
-
 			return;
 		}
 
@@ -450,4 +452,6 @@ class PWS_Map {
 
 }
 
+
 new PWS_Map();
+
