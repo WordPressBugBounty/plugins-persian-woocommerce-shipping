@@ -46,14 +46,14 @@ class PWS_Tapin_Method extends PWS_Shipping_Method {
 		$this->instance_form_fields += [
 			'extra_cost' => [
 				'title'       => 'هزینه های اضافی',
-				'type'        => 'text',
+				'type'        => 'price',
 				'description' => 'هزینه های اضافی علاوه بر نرخ پستی را می توانید وارد نمائید، (مثل: هزینه های بسته بندی و ...) مبلغ ثابت را به ' . $currency_symbol . ' وارد نمائید',
 				'default'     => 0,
 				'desc_tip'    => true,
 			],
 			'fixed_cost' => [
 				'title'       => 'هزینه ثابت',
-				'type'        => 'text',
+				'type'        => 'price',
 				'description' => "<b>توجه:</b>
 								<ul>
 									<li>1. برای محاسبه هزینه توسط فرمول تاپین/پست کتاب خالی بگذارید.</li>

@@ -45,14 +45,14 @@ class WC_Forehand_Method extends PWS_Shipping_Method {
 		$this->instance_form_fields += [
 			'extra_cost'         => [
 				'title'       => 'هزینه های اضافی',
-				'type'        => 'text',
+				'type'        => 'price',
 				'description' => 'هزینه های اضافی علاوه بر نرخ پستی را می توانید وارد نمائید، (مثل: هزینه های بسته بندی و ... ) مبلغ ثابت را به ریال وارد نمائید',
 				'default'     => 0,
 				'desc_tip'    => true,
 			],
 			'extra_cost_percent' => [
 				'title'       => 'هزینه های اضافی به درصد',
-				'type'        => 'text',
+				'type'        => 'price',
 				'description' => 'هزینه های اضافی علاوه بر نرخ پستی را می توانید به درصد وارد نمائید (مثال: برای 2%، عدد 2 را وارد نمائید)',
 				'default'     => 0,
 				'desc_tip'    => true,

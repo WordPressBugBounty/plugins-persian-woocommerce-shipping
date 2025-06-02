@@ -85,8 +85,12 @@ class Tapin_Special_Method extends PWS_Tapin_Method {
 
 		$cost *= max( $additions );
 
-		if ( in_array( $args['to_city'], [ 1, 91, 61, 51, 71, 81, 31 ] ) ) {
+		if ( in_array( $args['to_city'], [ 91, 61, 51, 71, 81 ] ) ) {
 			$cost *= 1.15;
+		}
+
+		if ( in_array( $args['to_city'], [ 1, 31 ] ) ) {
+			$cost *= 1.20;
 		}
 
 		// INSURANCE

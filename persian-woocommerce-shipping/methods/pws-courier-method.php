@@ -73,8 +73,7 @@ class WC_Courier_Method extends PWS_Shipping_Method {
 
 		$options = PWS()->get_terms_option( $this->get_destination( $package ) );
 
-		$options            = wp_list_pluck( $options, 'courier_on' );
-		$this->is_available = count( array_filter( $options ) ) == count( $options );
+		$this->is_available = count( array_column( $options, 'courier_on' ) ) == count( $options );
 
 		return parent::is_available( $package );
 	}

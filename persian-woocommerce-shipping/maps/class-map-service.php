@@ -263,6 +263,8 @@ abstract class PWS_Map_Service {
 			$user_has_location = true;
 		}
 
+
+
 		// Define shortcode attributes with default values
 		$atts = shortcode_atts( [
 			'min-width'             => '400px',
@@ -299,32 +301,32 @@ abstract class PWS_Map_Service {
 		$extra_html   = $this->get_extra_html();
 
 		return sprintf(
-			'<div class="pws-map__container %s"
-					    id="%s"
-					    style="width: %s; height: %s;"
-					    data-min-width="%s" 
-					    data-min-height="%s"  
-					    data-zoom="%s"
-					    data-type="%s"
-					    data-editable="%s"
-					    data-user-has-location="%s"
-					    data-center-lat="%s"
-					    data-center-long="%s"
-					    data-store-lat="%s"
-					    data-store-long="%s"
-					    data-user-marker-url="%s"
-					    data-user-marker-color="%s"
-					    data-store-marker-url="%s"
-					    data-store-marker-color="%s"
-					    data-store-marker-enable="%s"
-					    data-store-draw-line-color="%s"
-					    data-show-distance-type="%s"
-					    data-poi="%s"
-					    data-traffic="%s" >
-					    %s
-					    <input type="hidden" value="%s" name="pws_map_enabled_shipping_methods">
-					    <input type="hidden" value="%s" name="pws_map_required_location">
-					</div>',
+			"<div class='pws-map__container %s'
+						id='%s'
+						style='width: %s; height: %s;'
+						data-min-width='%s' 
+						data-min-height='%s'  
+						data-zoom='%s'
+						data-type='%s'
+						data-editable='%s'
+						data-user-has-location='%s'
+						data-center-lat='%s'
+						data-center-long='%s'
+						data-store-lat='%s'
+						data-store-long='%s'
+						data-user-marker-url='%s'
+						data-user-marker-color='%s'
+						data-store-marker-url='%s'
+						data-store-marker-color='%s'
+						data-store-marker-enable='%s'
+						data-store-draw-line-color='%s'
+						data-show-distance-type='%s'
+						data-poi='%s'
+						data-traffic='%s'>
+						%s
+						<input type='hidden' value='%s' name='pws_map_enabled_shipping_methods'>
+						<input type='hidden' value='%s' name='pws_map_required_location'>
+					</div>",
 			$map_class,
 			$map_id,
 			$this->sanitize_size( $atts['width'] ),

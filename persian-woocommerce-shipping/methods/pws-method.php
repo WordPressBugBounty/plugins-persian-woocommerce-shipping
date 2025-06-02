@@ -98,14 +98,14 @@ class PWS_Shipping_Method extends WC_Shipping_Method {
 		$this->instance_form_fields = apply_filters( 'pws_method_fields', $this->instance_form_fields + [
 				'minimum_fee' => [
 					'title'       => 'حداقل خرید',
-					'type'        => 'text',
+					'type'        => 'price',
 					'description' => 'در صورتی که مبلغ سفارش کمتر از این مبلغ باشد، این روش حمل و نقل مخفی می شود.',
 					'default'     => 0,
 					'desc_tip'    => true,
 				],
 				'free_fee'    => [
 					'title'       => 'آستانه حمل و نقل رایگان',
-					'type'        => 'text',
+					'type'        => 'price',
 					'description' => 'در صورتی که مبلغ سفارش بیشتر از این مبلغ باشد، هزینه حمل و نقل برای مشتری رایگان می شود.',
 					'default'     => '',
 					'desc_tip'    => true,
@@ -169,7 +169,9 @@ class PWS_Shipping_Method extends WC_Shipping_Method {
 
 		if ( $has_free_shipping ) {
 
-			$this->add_rate_cost( 0, $package );
+			$this->add_rate_cost( 0, $package, [
+				'payment_type' => 'prepaid',
+			] );
 
 			return true;
 		}

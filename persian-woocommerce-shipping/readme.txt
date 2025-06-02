@@ -1,11 +1,11 @@
 === افزونه حمل و نقل ووکامرس | پست پیشتاز، تیپاکس و پیک موتوری ===
 Contributors: mahdiy,nabiknet
-Tags: woocommerce,shipping,persian woocommerce,persian,ووکامرس فارسی
+Tags: حمل و نقل,ووکامس,ووکامرس فارسی,پست,تیپاکس
 Donate link: https://l.nabik.net/pws-pro?utm_source=donate
 Requires at least: 6.0.0
 Tested up to: 6.7.1
 Requires PHP: 7.4
-Stable tag: 4.2.5
+Stable tag: 4.2.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -34,7 +34,7 @@ License URI: https://www.gnu.org/licenses/gpl-3.0.html
 * و ...
 
 ## نسخه حرفه‌ای
-نیاز به امکانات حرفه‌ای تر دارید؟ [نسخه حرفه‌ای](https://nabik.net/product/persian-woocommerce-shipping-pro/) را بررسی کنید:
+نیاز به امکانات حرفه‌ای تر دارید؟ [نسخه حرفه‌ای](https://l.nabik.net/pws-pro?utm_source=repo) را بررسی کنید:
 * محاسبه اتوماتیک هزینه پست پیشتاز بر اساس وزن (تعرفه سال 1404)
 * تعریف شرط برای روش‌های حمل و نقل (براساس استان، شهر، محصول، دسته بندی، کلاس حمل و نقل، نقش کاربری، روش پرداخت، وزن، مجموع سبد خرید، تعداد اقلام سبد خرید و...)
 * بارگذاری سریع لیست شهرها
@@ -61,7 +61,7 @@ License URI: https://www.gnu.org/licenses/gpl-3.0.html
 * بروزرسانی خودکار وضعیت سفارشات داخل پنل ووکامرس
 
 ## ملی پیامک
-با استفاده از پنل پیامکی [ملی پیامک](https://www.melipayamak.com/price/) می توانید مشتریان خود را از آخرین وضعیت مرسوله خود با خبر کنید. از امکانات کلیدی ملی پیامک در افزونه حمل و نقل می توان به موارد زیر اشاره کرد:
+با استفاده از پنل پیامکی [ملی پیامک](https://l.nabik.net/melipayamak?utm_source=pws) می توانید مشتریان خود را از آخرین وضعیت مرسوله خود با خبر کنید. از امکانات کلیدی ملی پیامک در افزونه حمل و نقل می توان به موارد زیر اشاره کرد:
 * ارسال پیامک سریع با خطوط خدماتی
 * نصب و پیکربندی آسان بدون نیاز به دانش فنی
 * ارسال پیامک وضعیت سفارشات
@@ -101,6 +101,12 @@ Ask your questions in [Persian Woocommerce Shipping](https://nabik.net/contact/)
 6. Support Tapin dashboard
 
 == Changelog ==
+= 4.2.6 =
+* بروزرسانی نرخ نامه تاپین
+* بهبود تجربه کاربری سرویس نقشه
+* حل مشکل شرط‌ها در برخی حالت‌ها
+* حل مشکل کش و لیست خالی استان‌ها
+* حل مشکل خطا در پیک موتوری و تیپاکس
 = 4.2.5 =
 * معرفی سرویس «زودپک»
 * سازگاری با ووکامرس ۹.۸

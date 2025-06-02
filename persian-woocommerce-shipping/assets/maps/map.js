@@ -306,10 +306,10 @@ function pws_map_call_ajax(url, callback, headers) {
 }
 
 
-function pws_show_location_data(lat, lng) {
+function pws_show_location_data(lat, lng, vars) {
     let pws_order_map_coords = jQuery(".pws-order__map__coords");
 
-    if (!pws_order_map_coords.length) {
+    if (!pws_order_map_coords.length || !vars.user_has_location) {
         return;
     }
 

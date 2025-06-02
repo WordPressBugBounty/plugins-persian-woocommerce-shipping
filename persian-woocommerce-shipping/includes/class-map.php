@@ -280,7 +280,7 @@ class PWS_Map {
 	 *
 	 * @return array
 	 */
-	public static function get_order_location( WC_Order $order, array $default = null ): array {
+	public static function get_order_location( WC_Order $order, array $default = null ): ?array {
 		$location = $order->get_meta( 'pws_map_location' );
 
 		if ( ! isset( $location['lat'], $location['long'] ) ) {
@@ -378,21 +378,38 @@ class PWS_Map {
 			return;
 		}
 
-		[ $center_lat, $center_long ] = self::get_order_location( $order, self::get_store_location() );
+		[ $center_lat, $center_long ] = self::get_order_location( $order );
 
-		$enable_edit = '';
+		$enable_edit       = $default_center_lat = $default_center_long = '';
+		$user_has_location = '1';
 
 		if ( empty( $center_lat ) || empty( $center_long ) ) {
 			$enable_edit = 'checked';
+			// Zoom only
+			$user_has_location = '0';
+			[ $default_center_lat, $default_center_long ] = self::get_default_location_array();
 		}
 
-		$map = do_shortcode( "[pws_map center-lat='$center_lat' center-long='$center_long' min-width='200px' min-height='200px']" );
+		$map_center_lat  = empty( $center_lat ) ? $default_center_lat : $center_lat;
+		$map_center_long = empty( $center_long ) ? $default_center_long : $center_long;
 
-		$neshan_share_link = self::get_share_link( $center_lat, $center_long );
-		$neshan_logo_link  = PWS_URL . 'assets/images/neshan.png';
+		$map = do_shortcode( "[pws_map center-lat='$map_center_lat' center-long='$map_center_long' min-width='200px' min-height='200px' user-has-location='$user_has_location']" );
 
-		$balad_share_link = self::get_share_link( $center_lat, $center_long, 'balad' );
-		$balad_logo_link  = PWS_URL . 'assets/images/balad.png';
+		$share_link_html = '';
+		if ( ! empty( $center_lat ) && ! empty( $center_long ) ) {
+
+			$neshan_share_link = self::get_share_link( $center_lat, $center_long );
+			$neshan_logo_link  = PWS_URL . 'assets/images/neshan.png';
+
+			$balad_share_link = self::get_share_link( $center_lat, $center_long, 'balad' );
+			$balad_logo_link  = PWS_URL . 'assets/images/balad.png';
+
+			$share_link_html = <<<SHARE_LINK_HTML
+                                <div class="pws-order__map__neshan__share__link" title="برای کپی، کلیک کنید."><img src="$neshan_logo_link" alt="neshan"><span class="url">$neshan_share_link</span></div>
+                                <div class="pws-order__map__balad__share__link" title="برای کپی، کلیک کنید."><img src="$balad_logo_link" alt="balad"><span class="url">$balad_share_link</span></div>
+                                SHARE_LINK_HTML;
+
+		}
 
 		echo <<<ORDER_MAP_SECTION
                     <div class="pws-order__map__shipping_section">
@@ -403,8 +420,7 @@ class PWS_Map {
                              
                             <div class="pws-order__map__share__links__container">
                                  <span class="pws-order__map__share__links__custom__alert">لینک مسیریابی سفارش، با موفقیت کپی شد!</span>
-                                 <div class="pws-order__map__neshan__share__link" title="برای کپی، کلیک کنید."><img src="$neshan_logo_link" alt="neshan"><span class="url">$neshan_share_link</span></div>
-                                 <div class="pws-order__map__balad__share__link" title="برای کپی، کلیک کنید."><img src="$balad_logo_link" alt="balad"><span class="url">$balad_share_link</span></div>
+                                 $share_link_html
                             </div>
                         </div>  
                         <div class="action">

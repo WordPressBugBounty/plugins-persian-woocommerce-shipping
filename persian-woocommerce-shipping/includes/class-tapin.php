@@ -308,15 +308,13 @@ class PWS_Tapin extends PWS_Core {
 
 			$zone = self::zone();
 
-			$states = [];
-
-			foreach ( $zone as $code => $state ) {
-				$states[ $code ] = trim( $state['title'] );
-			}
+			$states = array_map( function ( $state ) {
+				return trim( $state['title'] );
+			}, $zone );
 
 			uasort( $states, [ self::class, 'pws_sort_state' ] );
 
-			set_transient( 'pws_tapin_states', $states, DAY_IN_SECONDS );
+			set_transient( 'pws_tapin_states', array_filter( $states ), DAY_IN_SECONDS );
 		}
 
 		return apply_filters( 'pws_states', $states );

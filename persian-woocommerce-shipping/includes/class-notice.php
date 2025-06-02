@@ -119,8 +119,8 @@ class PWS_Notice {
 				'dismiss'   => 6 * MONTH_IN_SECONDS,
 			],
 			[
-				'id'        => 'post_rate_temp_4',
-				'content'   => sprintf( '<b>تعرفه پستی سال ۱۴۰۳:</b> تعرفه‌های اداره پست بروزرسانی شد. جهت بهره‌مندی از تعرفه‌های پستی سال ۱۴۰۳، می‌توانید <a href="%s" target="_blank">نسخه حرفه‌ای افزونه حمل و نقل</a> را نصب و فعال نمایید. ', PWS()->pws_pro_url( 'post_1403' ) ),
+				'id'        => 'post_rate_temp_5',
+				'content'   => sprintf( '<b>تعرفه پستی سال ۱۴۰۴:</b> تعرفه‌های اداره پست بروزرسانی شد. جهت بهره‌مندی از تعرفه‌های پستی سال ۱۴۰۴، می‌توانید <a href="%s" target="_blank">نسخه حرفه‌ای افزونه حمل و نقل</a> را نصب و فعال نمایید. ', PWS()->pws_pro_url( 'post_1403' ) ),
 				'condition' => is_plugin_inactive( 'persian-woocommerce-shipping-pro/pws-pro.php' ),
 				'dismiss'   => MONTH_IN_SECONDS,
 			],

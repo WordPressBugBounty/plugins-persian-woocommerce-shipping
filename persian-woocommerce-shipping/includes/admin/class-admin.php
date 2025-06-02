@@ -156,12 +156,12 @@ class PWS_Admin {
 			'name' => 'شرط‌های حمل و نقل',
 			'type' => 'title',
 			'desc' => 'ابزار شرط‌های حمل و نقل فقط در <a href="' . PWS()->pws_pro_url( 'pws_rules' ) . '" target="_blank">نسخه حرفه‌ای</a> فعال می‌باشد.',
-			'id'   => 'pws_rules',
+			'id'   => 'pws_rules_section',
 		];
 
 		$settings[] = [
 			'type' => 'sectionend',
-			'id'   => 'pws_rules',
+			'id'   => 'pws_rules_section',
 		];
 
 		return $settings;

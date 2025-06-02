@@ -41,7 +41,7 @@
             if (pws_is_admin()) {
                 // Handle showing distance between user and store
                 pws_map_show_distance(pws_map_vars);
-                pws_show_location_data(pws_map_vars.user_lat, pws_map_vars.user_long);
+                pws_show_location_data(pws_map_vars.user_lat, pws_map_vars.user_long, pws_map_vars);
 
                 // Fix incomplete map
                 setTimeout(function () {

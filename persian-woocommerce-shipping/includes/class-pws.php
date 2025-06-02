@@ -125,17 +125,21 @@ class PWS_Core {
 	public function state_city_taxonomy() {
 
 		$labels = [
-			'name'              => __( 'شهرها' ),
-			'singular_name'     => __( 'شهرها' ),
-			'search_items'      => __( 'جستجو شهر' ),
-			'all_items'         => __( 'همه شهرها' ),
-			'parent_item'       => __( 'استان' ),
-			'parent_item_colon' => __( 'استان' ),
-			'edit_item'         => __( 'ویرایش شهر' ),
-			'update_item'       => __( 'بروزرسانی شهر' ),
-			'add_new_item'      => __( 'افزودن شهر جدید' ),
-			'new_item_name'     => __( 'نام شهر جدید' ),
-			'menu_name'         => __( 'شهرهای حمل و نقل' ),
+			'name'                     => __( 'شهرها' ),
+			'singular_name'            => __( 'شهرها' ),
+			'search_items'             => __( 'جستجو شهر' ),
+			'all_items'                => __( 'همه شهرها' ),
+			'parent_item'              => __( 'استان' ),
+			'parent_item_colon'        => __( 'استان' ),
+			'edit_item'                => __( 'ویرایش شهر' ),
+			'update_item'              => __( 'بروزرسانی شهر' ),
+			'add_new_item'             => __( 'افزودن شهر جدید' ),
+			'new_item_name'            => __( 'نام شهر جدید' ),
+			'menu_name'                => __( 'شهرهای حمل و نقل' ),
+			'name_field_description'   => __( 'نام نمایشی شهر یا استان را وارد کنید.' ),
+			'slug_field_description'   => __( 'نامک شهر یا استان را وارد کنید.' ),
+			'parent_field_description' => __( 'در صورت عدم انتخاب استان، مورد جدید بعنوان یک استان شناخته خواهد شد.' ),
+			'desc_field_description'   => __( 'توضیحات مرتبط با شهر یا استان را وارد کنید.' ),
 		];
 
 		register_taxonomy( 'state_city', null, [
@@ -203,10 +207,10 @@ class PWS_Core {
 		</th>
 		<td class="forminp">
 			<select name="<?php echo esc_attr( $value['id'] ); ?>"
-					style="<?php echo esc_attr( $value['css'] ); ?>"
-					data-placeholder="<?php esc_attr_e( 'Choose a country&hellip;', 'woocommerce' ); ?>"
-					aria-label="<?php esc_attr_e( 'Country', 'woocommerce' ) ?>"
-					class="wc-enhanced-select">
+			        style="<?php echo esc_attr( $value['css'] ); ?>"
+			        data-placeholder="<?php esc_attr_e( 'Choose a country&hellip;', 'woocommerce' ); ?>"
+			        aria-label="<?php esc_attr_e( 'Country', 'woocommerce' ) ?>"
+			        class="wc-enhanced-select">
 				<?php WC()->countries->country_dropdown_options( $country, $state ); ?>
 			</select>
 		</td>
@@ -237,7 +241,10 @@ class PWS_Core {
 		wp_register_style( 'select2', WC()->plugin_url() . '/assets/css/select2.css' );
 		wp_enqueue_style( 'select2' );
 
-		wp_enqueue_script( 'pws-admin-general', PWS_URL . 'assets/js/admin.js', [ 'jquery', 'selectWoo' ], PWS_VERSION );
+		wp_enqueue_script( 'pws-admin-general', PWS_URL . 'assets/js/admin.js', [
+			'jquery',
+			'selectWoo',
+		], PWS_VERSION );
 	}
 
 	public function add_shipping_method( $methods ) {
@@ -729,7 +736,7 @@ class PWS_Core {
 
 			uasort( $states, [ self::class, 'pws_sort_state' ] );
 
-			set_transient( 'pws_states', $states, DAY_IN_SECONDS );
+			set_transient( 'pws_states', array_filter( $states ), DAY_IN_SECONDS );
 		}
 
 		return apply_filters( 'pws_states', $states );
@@ -1108,7 +1115,7 @@ class PWS_Core {
 		file_put_contents( $log_file, $log, FILE_APPEND );
 	}
 
-	public static function pws_sort_state( $a, $b ) {
+	public static function pws_sort_state( $a, $b ): int {
 
 		if ( $a == $b ) {
 			return 0;
