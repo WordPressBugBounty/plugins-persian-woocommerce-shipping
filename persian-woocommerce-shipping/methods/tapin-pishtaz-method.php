@@ -90,12 +90,8 @@ class Tapin_Pishtaz_Method extends PWS_Tapin_Method {
 
 		}
 
-		if ( in_array( $box_size, range( 1, 3 ) ) ) {
-
-			if ( $args['content_type'] != 1 ) {
-				$additions[] = 1.25;
-			}
-
+		if ( $args['content_type'] != 1 ) {
+			$additions[] = 1.25;
 		}
 
 		$cost *= max( $additions );

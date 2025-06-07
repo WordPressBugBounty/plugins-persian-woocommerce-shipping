@@ -5,7 +5,7 @@ Donate link: https://l.nabik.net/pws-pro?utm_source=donate
 Requires at least: 6.0.0
 Tested up to: 6.7.1
 Requires PHP: 7.4
-Stable tag: 4.2.6
+Stable tag: 4.2.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -101,6 +101,9 @@ Ask your questions in [Persian Woocommerce Shipping](https://nabik.net/contact/)
 6. Support Tapin dashboard
 
 == Changelog ==
+= 2.4.7 =
+* معرفی درگاه پرداخت ایمن و هوشمند گیت‌لند
+* بروزرسانی نرخ نامه تاپین
 = 4.2.6 =
 * بروزرسانی نرخ نامه تاپین
 * بهبود تجربه کاربری سرویس نقشه

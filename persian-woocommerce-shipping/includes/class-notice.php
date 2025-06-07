@@ -99,6 +99,9 @@ class PWS_Notice {
 		$page = sanitize_text_field( $_GET['page'] ?? null );
 		$tab  = sanitize_text_field( $_GET['tab'] ?? null );
 
+		$has_gateland         = is_plugin_active( 'gateland/gateland.php' );
+		$gateland_install_url = admin_url( 'plugin-install.php?tab=plugin-information&plugin=gateland' );
+
 		$notices = [
 			[
 				'id'        => 'yith_alarm',
@@ -120,7 +123,7 @@ class PWS_Notice {
 			],
 			[
 				'id'        => 'post_rate_temp_5',
-				'content'   => sprintf( '<b>تعرفه پستی سال ۱۴۰۴:</b> تعرفه‌های اداره پست بروزرسانی شد. جهت بهره‌مندی از تعرفه‌های پستی سال ۱۴۰۴، می‌توانید <a href="%s" target="_blank">نسخه حرفه‌ای افزونه حمل و نقل</a> را نصب و فعال نمایید. ', PWS()->pws_pro_url( 'post_1403' ) ),
+				'content'   => sprintf( '<b>تعرفه پستی سال ۱۴۰۴:</b> تعرفه‌های اداره پست بروزرسانی شد. جهت بهره‌مندی از تعرفه‌های پستی سال ۱۴۰۴، می‌توانید <a href="%s" target="_blank">نسخه حرفه‌ای افزونه حمل و نقل</a> را نصب و فعال نمایید. ', PWS()->pws_pro_url( 'post_1404' ) ),
 				'condition' => is_plugin_inactive( 'persian-woocommerce-shipping-pro/pws-pro.php' ),
 				'dismiss'   => MONTH_IN_SECONDS,
 			],
@@ -140,6 +143,18 @@ class PWS_Notice {
 				'id'        => 'pws_video',
 				'content'   => '<b>آموزش:</b> برای پیکربندی حمل و نقل می توانید از <a href="https://yun.ir/pwsvideo" target="_blank">اینجا</a> فیلم های آموزشی افزونه را مشاهده کنید.',
 				'condition' => class_exists( 'WC_Data_Store' ) && ! count( WC_Data_Store::load( 'shipping-zone' )->get_zones() ),
+				'dismiss'   => 6 * MONTH_IN_SECONDS,
+			],
+			[
+				'id'        => 'gateland_dashboard',
+				'content'   => sprintf( '<b>افزونه درگاه پرداخت هوشمند «گیت لند»:</b> یک افزونه رایگان دیگر از نابیک، تجمیع ۴۳۲ افزونه فقط در یک افزونه! همین حالا میتونی به صورت کاملا رایگان تست کنی: <a href="%s" target="_blank">نصب سریع و رایگان از مخزن وردپرس</a>', $gateland_install_url ),
+				'condition' => ! $has_gateland,
+				'dismiss'   => 6 * MONTH_IN_SECONDS,
+			],
+			[
+				'id'        => 'zoodpack_orders',
+				'content'   => sprintf( '<b>🎉 زودپک</b> به افزونه رایگان حمل و نقل ووکامرس اضافه شد. ۱۵۰ هزار تومان هدیه اولین سفارش از زودپک با کد تخفیف Nabik! <a href="%s" target="_blank">لینک خرید</a>', 'https://l.nabik.net/zoodpack?utm_source=notice' ),
+				'condition' => 1,
 				'dismiss'   => 6 * MONTH_IN_SECONDS,
 			],
 		];

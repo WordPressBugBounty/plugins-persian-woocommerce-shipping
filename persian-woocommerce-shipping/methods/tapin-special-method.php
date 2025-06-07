@@ -71,10 +71,10 @@ class Tapin_Special_Method extends PWS_Tapin_Method {
 				$additions[] = 1.25;
 			}
 
-			if ( $args['content_type'] != 1 ) {
-				$additions[] = 1.25;
-			}
+		}
 
+		if ( $args['content_type'] != 1 ) {
+			$additions[] = 1.25;
 		}
 
 		$box_rates    = include PWS_DIR . '/data/special-rates.php';
