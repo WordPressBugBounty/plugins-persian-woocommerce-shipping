@@ -82,6 +82,7 @@ class PWS_Status {
 			$statuses['wc-pws-packaged'] = __( 'بسته بندی شده' );
 			$statuses['wc-pws-courier']  = __( 'تحویل پیک' );
 			$statuses['wc-pws-post']     = __( 'تحویل پست' );
+			$statuses['wc-pws-tipax']    = __( 'تحویل تیپاکس' );
 
 		}
 
@@ -248,13 +249,13 @@ class PWS_Status {
 		?>
 		<div class="alignleft actions custom">
 			<button type="button" id="pws-tapin-submit" class="button-primary"
-					title="جهت ثبت سفارشات انتخاب شده در پنل تاپین و دریافت بارکد پستی، کلیک کنید.">ثبت در تاپین
+			        title="جهت ثبت سفارشات انتخاب شده در پنل تاپین و دریافت بارکد پستی، کلیک کنید.">ثبت در تاپین
 			</button>
 			<?php
 			if ( PWS()->get_option( 'tapin.register_type', 1 ) == 1 ) {
 				?>
 				<button type="button" id="pws-tapin-ship" class="button-primary"
-						title="پس از ثبت سفارش در پنل، جهت اعلام به پست برای جمع آوری بسته اینجا کلیک کنید.">آماده ارسال
+				        title="پس از ثبت سفارش در پنل، جهت اعلام به پست برای جمع آوری بسته اینجا کلیک کنید.">آماده ارسال
 				</button>
 				<?php
 			} ?>
@@ -295,7 +296,7 @@ class PWS_Status {
 			<p class="form-field-wide">
 				<label for="tapin_weight">وزن سفارش:</label>
 				<input type="number" name="tapin_weight" id="tapin_weight" style="width: 100%"
-					   value="<?php echo intval( $tapin_weight ); ?>">
+				       value="<?php echo intval( $tapin_weight ); ?>">
 			</p>
 
 			<p class="form-field-wide">
@@ -325,14 +326,14 @@ class PWS_Status {
 			</p>
 
 			<button type="button" id="pws-tapin-submit" class="button-primary"
-					title="جهت ثبت سفارشات انتخاب شده در پنل تاپین و دریافت بارکد پستی، کلیک کنید.">ثبت در تاپین
+			        title="جهت ثبت سفارشات انتخاب شده در پنل تاپین و دریافت بارکد پستی، کلیک کنید.">ثبت در تاپین
 			</button>
 		<?php } else { ?>
 
 			<p class="form-field-wide">
 				<label>وزن سفارش:</label>
 				<input type="number" style="width: 100%"
-					   value="<?php echo intval( $tapin_weight ); ?>" disabled="disabled">
+				       value="<?php echo intval( $tapin_weight ); ?>" disabled="disabled">
 			</p>
 
 			<p class="form-field-wide">
@@ -360,7 +361,7 @@ class PWS_Status {
 			if ( PWS()->get_option( 'tapin.register_type', 1 ) == 1 ) {
 				?>
 				<button type="button" id="pws-tapin-ship" class="button-primary"
-						title="پس از ثبت سفارش در پنل، جهت اعلام به پست برای جمع آوری بسته اینجا کلیک کنید.">آماده ارسال
+				        title="پس از ثبت سفارش در پنل، جهت اعلام به پست برای جمع آوری بسته اینجا کلیک کنید.">آماده ارسال
 				</button>
 				<?php
 			}

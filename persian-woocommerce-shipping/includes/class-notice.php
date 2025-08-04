@@ -102,6 +102,8 @@ class PWS_Notice {
 		$has_gateland         = is_plugin_active( 'gateland/gateland.php' );
 		$gateland_install_url = admin_url( 'plugin-install.php?tab=plugin-information&plugin=gateland' );
 
+		$has_pws_pro = is_plugin_active( 'persian-woocommerce-shipping-pro/pws-pro.php' );
+
 		$notices = [
 			[
 				'id'        => 'yith_alarm',
@@ -124,13 +126,13 @@ class PWS_Notice {
 			[
 				'id'        => 'post_rate_temp_5',
 				'content'   => sprintf( '<b>تعرفه پستی سال ۱۴۰۴:</b> تعرفه‌های اداره پست بروزرسانی شد. جهت بهره‌مندی از تعرفه‌های پستی سال ۱۴۰۴، می‌توانید <a href="%s" target="_blank">نسخه حرفه‌ای افزونه حمل و نقل</a> را نصب و فعال نمایید. ', PWS()->pws_pro_url( 'post_1404' ) ),
-				'condition' => is_plugin_inactive( 'persian-woocommerce-shipping-pro/pws-pro.php' ),
+				'condition' => ! $has_pws_pro,
 				'dismiss'   => MONTH_IN_SECONDS,
 			],
 			[
 				'id'        => 'pws_pro_zone',
 				'content'   => '<b>حمل و نقل حرفه‌ای:</b> براساس شهرها مناطق حمل و نقل تعریف کنید، از نرخ ثابت حرفه‌ای بهره ببرید، برای آن‌ها شرط‌های متنوع و مختلف بگذارید و حمل و نقل فروشگاه‌تان را کاملا مدیریت کنید. <a href="' . PWS()->pws_pro_url( 'zone' ) . '" target="_blank">مشاهده امکانات حمل و نقل حرفه‌ای</a>',
-				'condition' => $tab == 'shipping' && is_plugin_inactive( 'persian-woocommerce-shipping-pro/pws-pro.php' ),
+				'condition' => $tab == 'shipping' && ! $has_pws_pro,
 				'dismiss'   => 6 * MONTH_IN_SECONDS,
 			],
 			[
@@ -154,7 +156,7 @@ class PWS_Notice {
 			[
 				'id'        => 'zoodpack_orders',
 				'content'   => sprintf( '<b>🎉 زودپک</b> به افزونه رایگان حمل و نقل ووکامرس اضافه شد. ۱۵۰ هزار تومان هدیه اولین سفارش از زودپک با کد تخفیف Nabik! <a href="%s" target="_blank">لینک خرید</a>', 'https://l.nabik.net/zoodpack?utm_source=notice' ),
-				'condition' => 1,
+				'condition' => ! $has_pws_pro,
 				'dismiss'   => 6 * MONTH_IN_SECONDS,
 			],
 		];

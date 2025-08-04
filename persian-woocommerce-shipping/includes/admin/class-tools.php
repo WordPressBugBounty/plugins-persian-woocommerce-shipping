@@ -53,6 +53,7 @@ class PWS_Settings_Tools extends PWS_Settings {
 						<li>بسته بندی شده</li>
 						<li>تحویل پیک</li>
 						<li>تحویل پست</li>
+						<li>تحویل تیپاکس</li>
 					</ol>
 					',
 				],

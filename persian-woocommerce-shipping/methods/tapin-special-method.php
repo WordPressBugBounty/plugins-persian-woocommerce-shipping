@@ -55,6 +55,8 @@ class Tapin_Special_Method extends PWS_Tapin_Method {
 
 		$additions = [ 1 ];
 
+		$box_size = max( 1, min( 10, $args['box_size'] ) );
+
 		if ( $args['from_province'] == $args['to_province'] ) {
 			$vicinity = 'in';
 		} elseif ( PWS()->check_states_beside( $args['from_province'], $args['to_province'] ) ) {
@@ -63,27 +65,11 @@ class Tapin_Special_Method extends PWS_Tapin_Method {
 			$vicinity = 'out';
 		}
 
-		$box_size = max( 1, min( 10, $args['box_size'] ) );
-
-		if ( in_array( $box_size, range( 1, 3 ) ) ) {
-
-			if ( $weight >= 2500 ) {
-				$additions[] = 1.25;
-			}
-
-		}
-
-		if ( $args['content_type'] != 1 ) {
-			$additions[] = 1.25;
-		}
-
 		$box_rates    = include PWS_DIR . '/data/special-rates.php';
 		$weight_index = min( ceil( $weight / 1000 ) * 1000, 30000 );
 		$weight_index = max( 1000, $weight_index );
 
 		$cost = $box_rates[ $weight_index ][ $box_size ][ $vicinity ];
-
-		$cost *= max( $additions );
 
 		if ( in_array( $args['to_city'], [ 91, 61, 51, 71, 81 ] ) ) {
 			$cost *= 1.15;
@@ -92,6 +78,12 @@ class Tapin_Special_Method extends PWS_Tapin_Method {
 		if ( in_array( $args['to_city'], [ 1, 31 ] ) ) {
 			$cost *= 1.20;
 		}
+
+		if ( $args['content_type'] != 1 ) {
+			$additions[] = 1.25;
+		}
+
+		$cost *= max( $additions );
 
 		// INSURANCE
 		if ( $args['price'] >= 50_000_000 ) {
