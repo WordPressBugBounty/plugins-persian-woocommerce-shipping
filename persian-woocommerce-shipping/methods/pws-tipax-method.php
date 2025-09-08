@@ -30,11 +30,10 @@ class WC_Tipax_Method extends PWS_Shipping_Method {
 	public function __construct( $instance_id = 0 ) {
 
 		$this->id                 = 'WC_Tipax_Method';
-		$this->instance_id        = absint( $instance_id );
 		$this->method_title       = __( 'تیپاکس' );
 		$this->method_description = __( 'ارسال کالا با استفاده از تیپاکس' );
 
-		parent::__construct();
+		parent::__construct( $instance_id );
 	}
 
 	public function init() {

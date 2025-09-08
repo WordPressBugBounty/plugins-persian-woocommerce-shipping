@@ -69,6 +69,7 @@ class PWS_Status {
 			add_action( 'wp_ajax_pws_change_order_status', [ $this, 'change_status_callback' ] );
 			add_action( 'wp', [ $this, 'check_status_scheduled' ] );
 			add_action( 'pws_check_status', [ $this, 'check_status_callback' ] );
+			add_action( 'woocommerce_orders_table_query_clauses', [ $this, 'orders_query_order_by_rand' ], 10, 3 );
 		}
 	}
 
@@ -785,6 +786,16 @@ class PWS_Status {
 
 		}
 
+	}
+
+	public function orders_query_order_by_rand( $clauses, $query, $args ) {
+		// Remove after OrdersTableQuery::sanitize_order_orderby mapping completed
+
+		if ( isset( $args['orderby'] ) && $args['orderby'] == 'rand' ) {
+			$clauses['orderby'] = 'RAND()';
+		}
+
+		return $clauses;
 	}
 
 }

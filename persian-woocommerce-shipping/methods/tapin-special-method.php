@@ -22,20 +22,12 @@ class Tapin_Special_Method extends PWS_Tapin_Method {
 	public function __construct( $instance_id = 0 ) {
 
 		$this->id                 = 'Tapin_Special_Method';
-		$this->instance_id        = absint( $instance_id );
 		$this->method_title       = 'پست ویژه - تاپین';
 		$this->method_description = 'ارسال کالا با استفاده از پست ويژه - تاپین (سرویس پست‌کتاب پست ویژه ندارد، پست ویژه مخصوص مراکز استان است)';
 
-		parent::__construct();
-	}
+		$this->supports[] = 'postpaid';
 
-	public function supports( $feature ) {
-
-		if ( $feature == 'postpaid' ) {
-			return true;
-		}
-
-		return parent::supports( $feature );
+		parent::__construct( $instance_id );
 	}
 
 	public function is_available( $package = [] ): bool {
@@ -130,6 +122,7 @@ class Tapin_Special_Method extends PWS_Tapin_Method {
 					break;
 			}
 
+			$cost += 37_000;
 		}
 
 		// TAX

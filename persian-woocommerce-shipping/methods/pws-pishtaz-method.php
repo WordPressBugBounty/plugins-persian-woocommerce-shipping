@@ -22,11 +22,10 @@ class WC_Forehand_Method extends PWS_Shipping_Method {
 	public function __construct( $instance_id = 0 ) {
 
 		$this->id                 = 'WC_Forehand_Method';
-		$this->instance_id        = absint( $instance_id );
 		$this->method_title       = 'پست پیشتاز';
 		$this->method_description = 'ارسال کالا با استفاده از پست پیشتاز';
 
-		parent::__construct();
+		parent::__construct( $instance_id );
 	}
 
 	public function init() {

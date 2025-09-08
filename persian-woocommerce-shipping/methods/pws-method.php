@@ -49,19 +49,30 @@ class PWS_Shipping_Method extends WC_Shipping_Method {
 	public $cart_weight = 0;
 
 	/**
+	 * Shipping method payment type (prepaid, postpaid). Default: prepaid
+	 *
+	 * @var string
+	 */
+	public string $payment_type;
+
+	/**
 	 * Is available
 	 *
 	 * @var bool
 	 */
 	public $is_available = true;
 
-	public function __construct() {
+	public function __construct( $instance_id = 0 ) {
 
-		$this->supports = [
-			'shipping-zones',
-			'instance-settings',
-			'instance-settings-modal',
-		];
+		$this->supports = array_diff( $this->supports, [ 'settings' ] );
+
+		$this->supports[] = 'shipping-zones';
+		$this->supports[] = 'instance-settings';
+		$this->supports[] = 'instance-settings-modal';
+
+		if ( $instance_id ) {
+			parent::__construct( $instance_id );
+		}
 
 		$this->init();
 	}
@@ -85,6 +96,22 @@ class PWS_Shipping_Method extends WC_Shipping_Method {
 				'desc_tip'    => true,
 			],
 		];
+
+		if ( $this->supports( 'postpaid' ) ) {
+
+			$this->instance_form_fields['payment_type'] = [
+				'title'       => 'نوع پرداخت',
+				'type'        => 'select',
+				'description' => 'پیشفرض: پرداخت آنلاین (پیش کرایه)',
+				'default'     => 'prepaid',
+				'desc_tip'    => true,
+				'options'     => [
+					'prepaid'  => 'پرداخت آنلاین',
+					'postpaid' => 'پس کرایه',
+				],
+			];
+
+		}
 
 		if ( ! defined( 'PWS_PRO_VERSION' ) ) {
 			$description = sprintf( 'نمایش توضیحات فقط در <a href="%s" target="_blank">نسخه حرفه‌ای</a> فعال می‌باشد.', PWS()->pws_pro_url( 'description' ) );
@@ -127,10 +154,11 @@ class PWS_Shipping_Method extends WC_Shipping_Method {
 			$this->method_description = $this->description;
 		}
 
-		$this->minimum_fee = $this->get_option( 'minimum_fee', 0 );
-		$this->free_fee    = $this->get_option( 'free_fee', '' );
-		$this->cart_total  = isset( WC()->cart ) ? WC()->cart->get_cart_contents_total() : 0;
-		$this->cart_weight = PWS_Cart::get_weight();
+		$this->minimum_fee  = $this->get_option( 'minimum_fee', 0 );
+		$this->free_fee     = $this->get_option( 'free_fee', '' );
+		$this->cart_total   = isset( WC()->cart ) ? WC()->cart->get_cart_contents_total() : 0;
+		$this->cart_weight  = PWS_Cart::get_weight();
+		$this->payment_type = $this->get_option( 'payment_type', 'prepaid' );
 	}
 
 	public function is_available( $package ): bool {
@@ -154,6 +182,12 @@ class PWS_Shipping_Method extends WC_Shipping_Method {
 		}
 
 		if ( $this->minimum_fee > $this->cart_total ) {
+			$available = false;
+		}
+
+		$payment_method = WC()->session->get( 'chosen_payment_method' );
+
+		if ( $payment_method === 'cod' && $this->payment_type == 'postpaid' ) {
 			$available = false;
 		}
 
@@ -181,9 +215,19 @@ class PWS_Shipping_Method extends WC_Shipping_Method {
 
 	public function add_rate_cost( $cost, $package, $meta_data = [] ) {
 
+		$meta_data = wp_parse_args( $meta_data, [
+			'payment_type' => $this->payment_type,
+		] );
+
+		$label = $this->title;
+
+		if ( $meta_data['payment_type'] == 'postpaid' ) {
+			$label .= __( ' - پس کرایه' );
+		}
+
 		$rate = apply_filters( 'pws_add_rate', [
 			'id'        => $this->get_rate_id(),
-			'label'     => $this->title,
+			'label'     => $label,
 			'cost'      => $cost,
 			'meta_data' => $meta_data,
 		], $package, $this );

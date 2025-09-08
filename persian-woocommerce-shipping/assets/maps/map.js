@@ -723,6 +723,24 @@ function pws_map_zoom_on_province(map_object, marker_layer) {
 
     $(document).on('ajaxComplete', function () {
         /**
+         * Responsive mobile map
+         * */
+        if ($('.pws-map__container').length) {
+
+            if ($(window).width() <= 768) {
+
+                $('.pws-map__container').each(function () {
+                    let current_map_style = $(this).attr("style") || "";
+                    $(this).attr("style", current_map_style + "; min-width: 0% !important;");
+                });
+
+                $(window).trigger('resize');
+
+            }
+
+        }
+
+        /**
          * Remove | from leaflet attribution
          * */
         let leaflet_control_attribution = $('.leaflet-control-attribution');

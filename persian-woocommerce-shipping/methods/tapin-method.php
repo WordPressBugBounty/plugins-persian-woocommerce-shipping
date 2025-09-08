@@ -103,6 +103,14 @@ class PWS_Tapin_Method extends PWS_Shipping_Method {
 			return;
 		}
 
+		if ( $this->payment_type == 'postpaid' ) {
+			$this->add_rate_cost( $this->extra_cost, $package, [
+				'payment_type' => 'postpaid',
+			] );
+
+			return;
+		}
+
 		$weight = PWS_Cart::get_weight();
 
 		$price = 0;
