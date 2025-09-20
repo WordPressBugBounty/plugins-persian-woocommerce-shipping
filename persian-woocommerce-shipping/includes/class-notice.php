@@ -31,12 +31,12 @@ class PWS_Notice {
 				continue;
 			}
 
-			$dismissible = $notice['dismiss'] ? 'is-dismissible' : '';
-
+			$dismissible    = $notice['dismiss'] ? 'is-dismissible' : '';
 			$notice_id      = esc_attr( $notice['id'] );
-			$notice_content = strip_tags( $notice['content'], '<p><a><b><img><ul><ol><li>' );
+			$notice_content = strip_tags( $notice['content'], '<p><a><b><img><ul><ol><li><input>' );
+			$notice_type    = esc_attr( $notice['type'] ?? 'success' );
 
-			printf( '<div class="notice pws_notice notice-success %s" id="pws_%s"><p>%s</p></div>', $dismissible, $notice_id, $notice_content );
+			printf( '<div class="notice pws_notice notice-%s %s" id="pws_%s"><p>%s</p></div>', $notice_type, $dismissible, $notice_id, $notice_content );
 
 			break;
 		}
@@ -149,7 +149,7 @@ class PWS_Notice {
 			],
 			[
 				'id'        => 'gateland_dashboard',
-				'content'   => sprintf( '<b>افزونه درگاه پرداخت هوشمند «گیت لند»:</b> یک افزونه رایگان دیگر از نابیک، تجمیع ۴۳۲ افزونه فقط در یک افزونه! همین حالا میتونی به صورت کاملا رایگان تست کنی: <a href="%s" target="_blank">نصب سریع و رایگان از مخزن وردپرس</a>', $gateland_install_url ),
+				'content'   => sprintf( '<b>افزونه درگاه پرداخت هوشمند «گیت لند»:</b> یک افزونه رایگان دیگر از نابیک، تجمیع ۴۳۲ افزونه فقط در یک افزونه! همین حالا میتونی به صورت کاملا رایگان تست کنی: <a href="%s" target="_blank"><input type="button" class="button button-primary" value="نصب سریع و رایگان از مخزن وردپرس"></a>', $gateland_install_url ),
 				'condition' => ! $has_gateland,
 				'dismiss'   => 6 * MONTH_IN_SECONDS,
 			],

@@ -67,6 +67,7 @@ class PWS_Status {
 			add_action( 'manage_posts_extra_tablenav', [ $this, 'top_order_list' ], 20, 1 );
 			add_action( 'woocommerce_order_list_table_extra_tablenav', [ $this, 'top_order_list' ], 20, 1 );
 			add_action( 'wp_ajax_pws_change_order_status', [ $this, 'change_status_callback' ] );
+			add_filter( 'cron_schedules', [ $this, 'cron_schedules' ] );
 			add_action( 'wp', [ $this, 'check_status_scheduled' ] );
 			add_action( 'pws_check_status', [ $this, 'check_status_callback' ] );
 			add_action( 'woocommerce_orders_table_query_clauses', [ $this, 'orders_query_order_by_rand' ], 10, 3 );
@@ -706,9 +707,18 @@ class PWS_Status {
 
 	}
 
+	public function cron_schedules( array $schedules ): array {
+		$schedules['per_quarter'] = [
+			'interval' => 15 * MINUTE_IN_SECONDS,
+			'display'  => __( 'A Quarter' ),
+		];
+
+		return $schedules;
+	}
+
 	public function check_status_scheduled() {
 		if ( ! wp_next_scheduled( 'pws_check_status' ) ) {
-			wp_schedule_event( time(), 'hourly', 'pws_check_status' );
+			wp_schedule_event( time(), 'per_quarter', 'pws_check_status' );
 		}
 	}
 
@@ -725,6 +735,7 @@ class PWS_Status {
 			],
 			'limit'      => 100,
 			'orderby'    => 'rand',
+			'pwsorderby' => 'rand', // Remove after OrdersTableQuery::sanitize_order_orderby mapping completed
 			'meta_query' => [
 				[
 					'key' => 'tapin_order_uuid',
@@ -791,7 +802,7 @@ class PWS_Status {
 	public function orders_query_order_by_rand( $clauses, $query, $args ) {
 		// Remove after OrdersTableQuery::sanitize_order_orderby mapping completed
 
-		if ( isset( $args['orderby'] ) && $args['orderby'] == 'rand' ) {
+		if ( isset( $args['pwsorderby'] ) && $args['pwsorderby'] == 'rand' ) {
 			$clauses['orderby'] = 'RAND()';
 		}
 

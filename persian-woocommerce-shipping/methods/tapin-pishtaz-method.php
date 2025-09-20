@@ -50,7 +50,12 @@ class Tapin_Pishtaz_Method extends PWS_Tapin_Method {
 				$vicinity = 'out';
 			}
 
-			$box_rates    = include PWS_DIR . '/data/pishtaz-rates.php';
+			$box_rates = include PWS_DIR . '/data/pishtaz-rates.php';
+
+			if ( in_array( $args['from_province'], [ 3, 4, 5, 7, 15, 16, 18, 19, 21, 23, 26, 27, 29, 30 ] ) ) {
+				$box_rates = include PWS_DIR . '/data/border-pishtaz-rates.php';
+			}
+
 			$weight_index = min( ceil( $weight / 1000 ) * 1000, 30000 );
 			$weight_index = max( 1000, $weight_index );
 
