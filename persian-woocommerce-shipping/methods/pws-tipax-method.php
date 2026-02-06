@@ -72,7 +72,7 @@ class WC_Tipax_Method extends PWS_Shipping_Method {
 
 		$options = PWS()->get_terms_option( $this->get_destination( $package ) );
 
-		$this->is_available = count( array_column( $options, 'tipax_on' ) ) == count( $options );
+		$this->is_available = count( array_column( $options, $this->get_rate_id() . '_on' ) ) == count( $options );
 
 		return parent::is_available( $package );
 	}
@@ -86,7 +86,7 @@ class WC_Tipax_Method extends PWS_Shipping_Method {
 		$cost = $this->base_cost;
 
 		$options = PWS()->get_terms_option( $this->get_destination( $package ) );
-		$options = array_column( $options, 'tipax_cost' );
+		$options = array_column( $options, $this->get_rate_id() );
 
 		foreach ( $options as $option ) {
 			if ( $option != '' ) {

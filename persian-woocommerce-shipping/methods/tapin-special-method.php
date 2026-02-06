@@ -23,7 +23,7 @@ class Tapin_Special_Method extends PWS_Tapin_Method {
 
 		$this->id                 = 'Tapin_Special_Method';
 		$this->method_title       = 'پست ویژه - تاپین';
-		$this->method_description = 'ارسال کالا با استفاده از پست ويژه - تاپین (سرویس پست‌کتاب پست ویژه ندارد، پست ویژه مخصوص مراکز استان است)';
+		$this->method_description = 'ارسال کالا با استفاده از پست ويژه - تاپین (پست ویژه مخصوص مراکز استان است)';
 
 		$this->supports[] = 'postpaid';
 
@@ -45,6 +45,8 @@ class Tapin_Special_Method extends PWS_Tapin_Method {
 
 		$weight = $args['weight'];
 
+		$gateway = $args['gateway'] ?? 'tapin';
+
 		$additions = [ 1 ];
 
 		$box_size = max( 1, min( 10, $args['box_size'] ) );
@@ -57,25 +59,30 @@ class Tapin_Special_Method extends PWS_Tapin_Method {
 			$vicinity = 'out';
 		}
 
-		$box_rates    = include PWS_DIR . '/data/special-rates.php';
+		$box_rates = include PWS_DIR . '/data/rates/tapin-special.php';
+
+		if ( in_array( $args['from_province'], [ 3, 4, 5, 7, 15, 16, 18, 19, 21, 23, 26, 27, 29, 30 ] ) ) {
+			$box_rates = include PWS_DIR . '/data/rates/tapin-special-border.php';
+		}
+
 		$weight_index = min( ceil( $weight / 1000 ) * 1000, 30000 );
 		$weight_index = max( 1000, $weight_index );
 
-		$cost = $box_rates[ $weight_index ][ $box_size ][ $vicinity ];
+		$cost = $base_cost = $box_rates[ $weight_index ][ $box_size ][ $vicinity ];
 
 		if ( in_array( $args['to_city'], [ 91, 61, 51, 71, 81 ] ) ) {
-			$cost *= 1.15;
+			$cost += $base_cost * 0.15;
+		} else if ( in_array( $args['to_city'], [ 1, 31 ] ) ) {
+			$cost += $base_cost * 0.20;
 		}
 
-		if ( in_array( $args['to_city'], [ 1, 31 ] ) ) {
-			$cost *= 1.20;
+		if ( $gateway == 'posteketab' ) {
+			$cost *= 0.7;
 		}
 
 		if ( $args['content_type'] != 1 ) {
-			$additions[] = 1.25;
+			$cost += $base_cost * 0.25;
 		}
-
-		$cost *= max( $additions );
 
 		// INSURANCE
 		if ( $args['price'] >= 50_000_000 ) {

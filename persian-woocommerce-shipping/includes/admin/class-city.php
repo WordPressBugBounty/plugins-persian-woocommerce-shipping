@@ -9,6 +9,13 @@ defined( 'ABSPATH' ) || exit;
 
 class PWS_City {
 
+	/**
+	 * @var WC_Shipping_Zone[]
+	 */
+	private static $zones = null;
+
+	private static $methods = null;
+
 	public function __construct() {
 
 		add_filter( 'user_has_cap', [ $this, 'user_has_cap' ], 10, 4 );
@@ -207,13 +214,33 @@ class PWS_City {
 			PWS()->delete_term_option( $term_id );
 		}
 
-		$table_headers = apply_filters( 'pws_city_table_headers', [
-			'tipax_on'      => '<input type="checkbox" title="فعالسازی/غیرفعالسازی تیپاکس" data-scope="tipax_on">',
-			'tipax'         => 'هزینه پایه تیپاکس',
-			'courier_on'    => '<input type="checkbox" title="فعالسازی/غیرفعالسازی پیک‌موتوری" data-scope="courier_on">',
-			'courier'       => 'هزینه پایه پیک‌موتوری',
-			'forehand_cost' => 'هزینه ثابت پست‌پیشتاز',
-		] );
+		$table_headers = [];
+
+		foreach ( self::zones() as $zone ) {
+
+			foreach ( self::methods( $zone ) as $shipping_method_instance_id => $shipping_method_instance ) {
+
+				$option_id = $shipping_method_instance->get_rate_id();
+
+				// Translators: %1$s shipping method title, %2$s shipping method id.
+				$option_instance_title = sprintf( '%1$s (#%2$s)', $shipping_method_instance->get_title(),
+					$shipping_method_instance_id );
+
+				// Translators: %1$s zone name, %2$s shipping method instance name.
+				$option_title = sprintf( '%1$s &ndash; %2$s',
+					$zone->get_id() ? $zone->get_zone_name() : __( 'Other locations', 'woocommerce' ),
+					$option_instance_title );
+
+				if ( $shipping_method_instance instanceof PWS_Shipping_Method ) {
+
+					if ( $shipping_method_instance instanceof WC_Tipax_Method ) {
+						$table_headers[ $option_id . '_on' ] = "<input type='checkbox' title='فعالسازی/غیرفعالسازی {$option_title}' data-scope='{$option_id}_on'>";
+					}
+
+					$table_headers[ $option_id ] = $option_title;
+				}
+			}
+		}
 
 		?>
 		<div class="wrap">
@@ -251,33 +278,33 @@ class PWS_City {
 						$term_id     = $term->term_id;
 						$term_option = PWS()->get_term_option( $term_id );
 
-						$term_option = wp_parse_args( $term_option, [
-							'tipax_on'      => false,
-							'tipax_cost'    => null,
-							'courier_on'    => false,
-							'courier_cost'  => null,
-							'forehand_cost' => null,
-						] );
-
 						$indent = str_repeat( "- ",
 							max( count( get_ancestors( $term->term_id, 'state_city' ) ) - 1, 0 ) );
 
-						$tipax_checked   = checked( $term_option['tipax_on'], 1, false );
-						$courier_checked = checked( $term_option['courier_on'], 1, false );
+						$rows = [];
 
-						$row = [
-							'tipax_on'      => "<input type='checkbox' name='%s' title='%s' class='%s' value='1' {$tipax_checked} data-parent='{$term->parent}'>",
-							'tipax_cost'    => "<input type='text' name='%s' title='%s' class='%s' value='{$term_option['tipax_cost']}'>",
-							'courier_on'    => "<input type='checkbox' name='%s' title='%s' class='%s' value='1' {$courier_checked} data-parent='{$term->parent}'>",
-							'courier_cost'  => "<input type='text' name='%s' title='%s' class='%s' value='{$term_option['courier_cost']}'>",
-							'forehand_cost' => "<input type='text' name='%s' title='%s' class='%s'  value='{$term_option['forehand_cost']}'>",
-						];
+						foreach ( self::zones() as $zone ) {
 
-						$row = apply_filters( 'pws_city_table_row', $row, $term, $term_option );
+							foreach ( self::methods( $zone ) as $shipping_method_instance_id => $shipping_method_instance ) {
+
+								$option_id = $shipping_method_instance->get_rate_id();
+
+								if ( $shipping_method_instance instanceof PWS_Shipping_Method ) {
+
+									if ( $shipping_method_instance instanceof WC_Tipax_Method ) {
+										$checked                    = checked( $term_option[ $option_id . '_on' ] ?? false, 1, false );
+										$rows[ $option_id . '_on' ] = "<input type='checkbox' name='%s' title='%s' class='%s' value='1' {$checked} data-parent='{$term->parent}'>";
+									}
+
+									$value              = $term_option[ $option_id ] ?? null;
+									$rows[ $option_id ] = "<input type='text' name='%s' title='%s' class='%s' style='width: 150px' value='{$value}'>";
+								}
+							}
+						}
 
 						printf( "<tr><td>%s%s</td>", esc_attr( $indent ), esc_attr( $term->name ) );
 
-						foreach ( $row as $col => $input ) {
+						foreach ( $rows as $col => $input ) {
 							$input_name = "term_meta[{$term_id}][{$col}]";
 							printf( "<td>{$input}</td>", $input_name, $term->name, $col );
 						}
@@ -418,6 +445,36 @@ class PWS_City {
 		}
 
 		return $location;
+	}
+
+	public static function zones(): array {
+
+		if ( ! is_null( self::$zones ) ) {
+			return self::$zones;
+		}
+
+		self::$zones = [];
+
+		$data_store = WC_Data_Store::load( 'shipping-zone' );
+
+		foreach ( $data_store->get_zones() as $raw_zone ) {
+			self::$zones[] = new WC_Shipping_Zone( $raw_zone );
+		}
+
+		self::$zones[] = new WC_Shipping_Zone( 0 );
+
+		return self::$zones;
+	}
+
+	public static function methods( WC_Shipping_Zone $zone ) {
+
+		if ( isset( self::$methods[ $zone->get_id() ] ) ) {
+			return self::$methods[ $zone->get_id() ];
+		}
+
+		self::$methods[ $zone->get_id() ] = $zone->get_shipping_methods();
+
+		return self::$methods[ $zone->get_id() ];
 	}
 }
 

@@ -19,6 +19,21 @@ class WC_Forehand_Method extends PWS_Shipping_Method {
 
 	const TAX = 10;
 
+	/**
+	 * @var mixed
+	 */
+	public $extra_cost;
+
+	/**
+	 * @var mixed
+	 */
+	public $extra_cost_percent;
+
+	/**
+	 * @var mixed
+	 */
+	public $source_state;
+
 	public function __construct( $instance_id = 0 ) {
 
 		$this->id                 = 'WC_Forehand_Method';
@@ -86,7 +101,7 @@ class WC_Forehand_Method extends PWS_Shipping_Method {
 		}
 
 		$options = PWS()->get_terms_option( $this->get_destination( $package ) );
-		$options = array_column( $options, 'forehand_cost' );
+		$options = array_column( $options, $this->get_rate_id() );
 
 		foreach ( $options as $option ) {
 			if ( $option != '' ) {

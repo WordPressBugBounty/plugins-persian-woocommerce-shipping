@@ -247,13 +247,13 @@ class PWS_Version {
 				// $array[0] is lat, I'm assuming that till this version all the clients have iran shipping
 				// iran lat is between  25.078237,39.777672
 				// Transform the simple array to an array with keys
-				if ( isset( $array[0] ) && isset( $array[1] ) && (float) $array[0] > 40 ) {
+				if ( isset( $array[1] ) && (float) $array[0] > 40 ) {
 					// if lat is more than maximum for safety we'll change lat and long
 					$array = array_reverse( $array );
 				}
 				$transformed = [
-					'lat'  => isset( $array[0] ) ? $array[0] : null,
-					'long' => isset( $array[1] ) ? $array[1] : null,
+					'lat'  => $array[0] ?? null,
+					'long' => $array[1] ?? null,
 				];
 
 				return maybe_serialize( $transformed );
@@ -328,6 +328,109 @@ class PWS_Version {
 		}
 
 	}
+
+	public function update_440() {
+		global $wpdb;
+
+		// Make dynamic methods
+		$options = $wpdb->get_results(
+			"SELECT * FROM `{$wpdb->options}` WHERE `option_name` LIKE ('nabik_taxonomy_%');",
+			ARRAY_A
+		);
+
+		foreach ( wp_list_pluck( $options, 'option_value', 'option_id' ) as $option_id => $option_value ) {
+
+			$data = maybe_unserialize( $option_value );
+
+			foreach ( PWS_City::zones() as $zone ) {
+
+				foreach ( PWS_City::methods( $zone ) as $shipping_method_instance_id => $shipping_method_instance ) {
+
+					$method_id = $shipping_method_instance->get_rate_id();
+
+					if ( $shipping_method_instance instanceof WC_Courier_Method ) {
+
+						if ( isset( $data['courier_on'] ) && $data['courier_on'] ) {
+							$data[ $method_id . '_on' ] = 1;
+						}
+
+						if ( isset( $data['courier_cost'] ) && $data['courier_cost'] != '' ) {
+							$data[ $method_id ] = $data['courier_cost'];
+						}
+
+					} elseif ( $shipping_method_instance instanceof WC_Tipax_Method ) {
+
+						if ( isset( $data['tipax_on'] ) && $data['tipax_on'] ) {
+							$data[ $method_id . '_on' ] = 1;
+						}
+
+						if ( isset( $data['tipax_cost'] ) && $data['tipax_cost'] != '' ) {
+							$data[ $method_id ] = $data['tipax_cost'];
+						}
+
+					} elseif ( $shipping_method_instance instanceof WC_Forehand_Method || $shipping_method_instance instanceof Tapin_Pishtaz_Method ) {
+
+						if ( isset( $data['forehand_cost'] ) && $data['forehand_cost'] != '' ) {
+							$data[ $method_id ] = $data['forehand_cost'];
+						}
+
+					}
+				}
+			}
+
+			if ( maybe_serialize( $data ) != $option_value ) {
+				$wpdb->update(
+					$wpdb->options,
+					[
+						'option_value' => maybe_serialize( $data ),
+						'autoload'     => 'off',
+					],
+					[ 'option_id' => $option_id ]
+				);
+			}
+		}
+
+		// Move Courier delivery areas to method options
+		$methods = [];
+
+		$options = $wpdb->get_results(
+			"SELECT * FROM `{$wpdb->options}` WHERE `option_name` LIKE ('nabik_taxonomy_%');",
+			ARRAY_A
+		);
+
+		foreach ( wp_list_pluck( $options, 'option_value', 'option_name' ) as $option_name => $option_value ) {
+
+			if ( str_contains( $option_name, 'state' ) ) {
+				continue;
+			}
+
+			$data = maybe_unserialize( $option_value );
+
+			$parts   = explode( '_', $option_name );
+			$term_id = end( $parts );
+
+			foreach ( $data as $method_instance_id => $value ) {
+
+				if ( str_contains( $method_instance_id, 'WC_Courier_Method' ) && str_contains( $method_instance_id, '_on' ) ) {
+					$methods[ str_replace( '_on', '', $method_instance_id ) ][] = $term_id;
+				}
+
+			}
+
+		}
+
+		foreach ( $methods as $method_id => $delivery_areas ) {
+
+			$method_id   = str_replace( ':', '_', $method_id );
+			$option_name = "woocommerce_{$method_id}_settings";
+
+			$data                   = (array) get_option( $option_name, [] );
+			$data['delivery_areas'] = $delivery_areas;
+			update_option( $option_name, $data );
+
+		}
+	}
+
 }
 
 add_action( 'admin_init', function () {

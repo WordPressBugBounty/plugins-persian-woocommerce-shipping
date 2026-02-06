@@ -41,17 +41,18 @@ class PWS_Settings_Tapin extends PWS_Settings {
 
 			$shop = PWS_Tapin::shop();;
 
-			if ( ! isset( $shop->title ) ) {
+			if ( ! isset( $shop['title'] ) ) {
 				$shop = '<span style="color: red;">اطلاعات فروشگاه بارگذاری نشده است و ممکن است هزینه های ارسال بطور دقیق محاسبه نشود.</span>';
 			} else {
 
 				$services = PWS_Tapin::services();
 
-				$shop = sprintf( '%s | %s %s | نرخ خدمات: %s | اطلاعات %d شهر بارگذاری شد.',
-					$shop->title,
-					PWS()::get_state( $shop->province_code ),
-					PWS()::get_city( $shop->city_code ),
-					wc_price( $shop->total_price, [ 'currency' => 'IRR' ] ),
+				$shop = sprintf(
+					'%s | %s %s | نرخ خدمات: %s | اطلاعات %d شهر بارگذاری شد.',
+					$shop['title'],
+					PWS()::get_state( $shop['province_code'] ),
+					PWS()::get_city( $shop['city_code'] ),
+					wc_price( $shop['total_price'], [ 'currency' => 'IRR' ] ),
 					count( $services )
 				);
 
@@ -62,15 +63,11 @@ class PWS_Settings_Tapin extends PWS_Settings {
 			$shop = '';
 		}
 
+		$host_ip = $_SERVER['SERVER_ADDR'] ?? '-';
+
 		if ( isset( $_GET['tapin_check_ip'] ) ) {
-
-			$response = wp_remote_get( 'https://checkip.tapin.ir/' );
-			$response = wp_remote_retrieve_body( $response );
-
-			if ( $response ) {
-				$shop .= ' | ' . $response;
-			}
-
+			$response = wp_remote_get( 'https://icanhazip.com' );
+			$host_ip  = wp_remote_retrieve_body( $response );
 		}
 
 		if ( ( $_GET['page'] ?? null ) == 'pws-tapin' ) {
@@ -159,7 +156,7 @@ class PWS_Settings_Tapin extends PWS_Settings {
 					'name'    => 'token',
 					'default' => '',
 					'type'    => 'text',
-					'desc'    => 'توکن خود را از <a href="https://my.tapin.ir/" target="_blank">پیشخوان مجازی تاپین</a> دریافت کنید. آدرس آی.پی شما: ' . esc_attr( $_SERVER['SERVER_ADDR'] ?? '-' ),
+					'desc'    => 'توکن خود را از <a href="https://my.tapin.ir/" target="_blank">پیشخوان مجازی تاپین</a> دریافت کنید. آدرس آی.پی شما: ' . esc_attr( $host_ip ),
 				],
 				[
 					'label'   => 'شناسه فروشگاه',
@@ -181,7 +178,7 @@ class PWS_Settings_Tapin extends PWS_Settings {
 				[
 					'name' => 'notes',
 					'desc' => sprintf( 'نکات:<ol>
-<li>سرویس تیپاکس در حال حاضر بسته‌های بین ۱ تا ۱۵ کیلوگرم را می‌پذیرد.</li>
+<li>سرویس تیپاکس در حال حاضر بسته‌های بین ۵۰ گرم تا ۳۰ کیلوگرم را می‌پذیرد.</li>
 <li>سرویس تیپاکس بسته‌های به ارزش ۴۰۰ هزار تا حداکثر ۶۰ میلیون تومان را می‌پذیرد.</li>
 <li>نمایندگی‌های دریافت سفارش‌ها در لینک روبرو قابل مشاهده هستند: https://map.tapin.ir/accept-tipax</li>
 <li style="display: %s">این امکان فقط در <a href="%s" target="_blank">نسخه حرفه‌ای</a> فعال می‌باشد.</li>

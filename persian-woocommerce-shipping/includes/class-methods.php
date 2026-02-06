@@ -5,8 +5,25 @@ defined( 'ABSPATH' ) || exit;
 class PWS_Methods {
 
 	public function __construct() {
+		add_filter( 'admin_head', [ $this, 'admin_head' ] );
 		add_filter( 'woocommerce_shipping_method_add_rate', [ $this, 'method_args' ], 10, 3 );
 		add_filter( 'woocommerce_order_item_get_formatted_meta_data', [ $this, 'add_payment_type' ], 10, 2 );
+	}
+
+	public function admin_head() {
+
+		$page = $_GET['page'] ?? null;
+		$tab  = $_GET['tab'] ?? null;
+
+		if ( $page != 'wc-settings' || $tab != 'shipping' ) {
+			return;
+		}
+
+		wp_add_inline_script( 'wc-backbone-modal', "
+            jQuery(document.body).on('wc_backbone_modal_loaded', () => {
+                jQuery('#woocommerce_WC_Courier_Method_delivery_areas').select2();
+            });
+		" );
 	}
 
 	public function method_args( WC_Shipping_Rate $rate, array $args, WC_Shipping_Method $method ): WC_Shipping_Rate {

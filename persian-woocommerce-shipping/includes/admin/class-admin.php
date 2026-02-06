@@ -61,12 +61,6 @@ class PWS_Admin {
 				'slug'       => 'admin.php?page=wc-settings&tab=shipping&section=pws_rules',
 				'callback'   => '',
 			],
-			60 => [
-				'title'      => 'زودپک',
-				'capability' => $capability,
-				'slug'       => 'https://l.nabik.net/zoodpack',
-				'callback'   => '',
-			],
 		];
 
 		if ( ! defined( 'PWS_PRO_VERSION' ) ) {
@@ -98,11 +92,6 @@ class PWS_Admin {
 		<script type="text/javascript">
             jQuery(document).ready(function ($) {
                 $("a[href*='l.nabik.net']").attr('target', '_blank');
-
-                $("a[href*='l.nabik.net/zoodpack']").html(`
-                	<img src="<?php echo PWS_URL . 'assets/images/zoodpack.png'; ?>"
-                	style="display: inline; height: 12px;position: relative;top: 2px;" /> زودپک
-                `);
             });
 		</script>
 		<?php

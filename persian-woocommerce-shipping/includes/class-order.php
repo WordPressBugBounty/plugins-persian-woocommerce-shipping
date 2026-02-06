@@ -121,7 +121,9 @@ class PWS_Order {
 				continue;
 			}
 
-			$price = ( $order_item->get_total() + $order_item->get_total_tax() ) / $order_item->get_quantity();
+			$price = wc_get_price_including_tax( $product, [
+				'price' => $product->get_regular_price(),
+			] );
 			$price = ceil( $price );
 
 			$price = PWS()->convert_currency_to_IRR( $price );
@@ -130,6 +132,10 @@ class PWS_Order {
 
 			if ( empty( $title ) ) {
 				$title = $order_item->get_name();
+
+				foreach ( $order_item->get_formatted_meta_data() as $meta_data ) {
+					$title .= ' | ' . strip_tags( $meta_data->display_value );
+				}
 			}
 
 			if ( function_exists( 'mb_substr' ) ) {
@@ -175,6 +181,10 @@ class PWS_Order {
 
 			if ( empty( $title ) ) {
 				$title = $order_item->get_name();
+
+				foreach ( $order_item->get_formatted_meta_data() as $meta_data ) {
+					$title .= ' | ' . strip_tags( $meta_data->display_value );
+				}
 			}
 
 			if ( function_exists( 'mb_substr' ) ) {

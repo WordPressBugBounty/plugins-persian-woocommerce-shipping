@@ -77,6 +77,21 @@ class PWS_Tapin_Method extends PWS_Shipping_Method {
 			return false;
 		}
 
+		if ( PWS()->get_option( 'tapin.gateway', 'tapin' ) == 'posteketab' ) {
+
+			$payment_method = WC()->session->get( 'chosen_payment_method' );
+			$is_cod         = $payment_method === 'cod';
+
+			if ( $is_cod ) {
+				return false;
+			}
+
+			if ( $this->payment_type == 'postpaid' ) {
+				return false;
+			}
+
+		}
+
 		return parent::is_available( $package );
 	}
 
@@ -87,7 +102,7 @@ class PWS_Tapin_Method extends PWS_Shipping_Method {
 		}
 
 		$options = PWS()->get_terms_option( $this->get_destination( $package ) );
-		$options = array_column( $options, 'forehand_cost' );
+		$options = array_column( $options, $this->get_rate_id() );
 
 		foreach ( $options as $option ) {
 			if ( $option != '' ) {
@@ -117,11 +132,17 @@ class PWS_Tapin_Method extends PWS_Shipping_Method {
 
 		foreach ( WC()->cart->get_cart() as $cart_item ) {
 
-			if ( $cart_item['data']->is_virtual() ) {
+			/** @var WC_Product $product */
+			$product = $cart_item['data'];
+
+			if ( $product->is_virtual() ) {
 				continue;
 			}
 
-			$price += $cart_item['data']->get_price() * $cart_item['quantity'];
+			$price += wc_get_price_including_tax( $product, [
+				'qty'   => $cart_item['quantity'],
+				'price' => $product->get_regular_price(),
+			] );
 		}
 
 		$destination = $package['destination'];
@@ -140,9 +161,9 @@ class PWS_Tapin_Method extends PWS_Shipping_Method {
 			'weight'        => ceil( $weight ),
 			'is_cod'        => $is_cod,
 			'to_province'   => intval( $destination['state'] ),
-			'from_province' => intval( $shop->province_code ?? 1 ),
+			'from_province' => intval( $shop['province_code'] ?? 1 ),
 			'to_city'       => intval( $destination['city'] ),
-			'from_city'     => intval( $shop->city_code ?? 1 ),
+			'from_city'     => intval( $shop['city_code'] ?? 1 ),
 			'content_type'  => PWS()->get_option( 'tapin.content_type', 1 ),
 			'box_size'      => PWS()->get_option( 'tapin.box_size', 1 ),
 		];
@@ -151,11 +172,11 @@ class PWS_Tapin_Method extends PWS_Shipping_Method {
 
 		$shipping_total = $this->calculate_rates( $args );
 
-		if ( isset( $shop->total_price ) ) {
-			$shipping_total += $shop->total_price;
+		if ( isset( $shop['total_price'] ) ) {
+			$shipping_total += $shop['total_price'];
 		}
 
-		if ( isset( $shop->has_first_mile_request ) && $shop->has_first_mile_request ) {
+		if ( isset( $shop['has_first_mile_request'] ) && $shop['has_first_mile_request'] ) {
 			$shipping_total += 16500;
 		}
 

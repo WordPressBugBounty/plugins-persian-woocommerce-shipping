@@ -35,6 +35,12 @@ class PWS_Settings_Tools extends PWS_Settings {
 
 		$has_pro = defined( 'PWS_PRO_VERSION' );
 
+		$all_shipping_methods = [];
+
+		if ( ( $_GET['page'] ?? null ) == 'pws-tools' ) {
+			$all_shipping_methods = PWS_Map::get_all_shipping_methods();
+		}
+
 		return apply_filters( 'pws_settings_fields', [
 			'pws_tools' => [
 				[
@@ -117,7 +123,7 @@ class PWS_Settings_Tools extends PWS_Settings {
 					'name' => 'pws_map_description',
 					'type' => 'html',
 					'desc' => '<p>نقشه را در صفحه تسویه حساب و یا با استفاده از کد کوتاه [pws_map]، در صفحات دلخواه نمایش دهید.</p>',
-					'id'   => 'pws_map_description'
+					'id'   => 'pws_map_description',
 				],
 				[
 					'label'   => 'سرویس نمایش نقشه',
@@ -129,7 +135,7 @@ class PWS_Settings_Tools extends PWS_Settings {
 						'neshan' => 'Neshan.org (نشان)',
 						'mapp'   => 'Map.ir (مپ)',
 					],
-					'desc'    => '<p class="pws-map__info-OSM">OpenStreetMap یک سرویس جهانی است با قابلیت‌های متنوع که برای نمایش نقشه و ارائه داده‌های جغرافیایی به‌صورت آزاد و قابل دسترس برای همه طراحی شده است.</p>' . '<p class="pws-map__info-neshan">نشان یک سرویس ایرانی با قابلیت‌های متنوع است که برای نمایش نقشه و ارائه خدمات جغرافیایی طراحی شده است.</p>' . '<p class="pws-map__info-mapp">زیرساخت نقشهٔ مپ یک پلتفرم قدرتمند است که نتیجهٔ ۲۰ سال فعالیت در حوزهٔ GIS است و برای ارائه بهترین سرویس‌های نقشه با تمرکز بر نیازهای محلی کسب‌وکارهای مکان-مبنا توسعه یافته.</p>'
+					'desc'    => '<p class="pws-map__info-OSM">OpenStreetMap یک سرویس جهانی است با قابلیت‌های متنوع که برای نمایش نقشه و ارائه داده‌های جغرافیایی به‌صورت آزاد و قابل دسترس برای همه طراحی شده است.</p>' . '<p class="pws-map__info-neshan">نشان یک سرویس ایرانی با قابلیت‌های متنوع است که برای نمایش نقشه و ارائه خدمات جغرافیایی طراحی شده است.</p>' . '<p class="pws-map__info-mapp">زیرساخت نقشهٔ مپ یک پلتفرم قدرتمند است که نتیجهٔ ۲۰ سال فعالیت در حوزهٔ GIS است و برای ارائه بهترین سرویس‌های نقشه با تمرکز بر نیازهای محلی کسب‌وکارهای مکان-مبنا توسعه یافته.</p>',
 
 				],
 
@@ -194,7 +200,7 @@ class PWS_Settings_Tools extends PWS_Settings {
 					'name'    => 'shipping_methods',
 					'default' => '',
 					'type'    => 'multiselect',
-					'options' => PWS_Map::get_all_shipping_methods(),
+					'options' => $all_shipping_methods,
 					'desc'    => 'عدم انتخاب روش حمل و نقل به منزله نمایش نقشه در تمامی روش ها می‌باشد.',
 				],
 				[
@@ -202,13 +208,13 @@ class PWS_Settings_Tools extends PWS_Settings {
 					'name'    => 'store_marker_enable',
 					'default' => '0',
 					'type'    => 'checkbox',
-					'desc'    => 'برای نمایش محل فروشگاه روی نقشه جهت نمایش به کاربر، فعال کنید.'
+					'desc'    => 'برای نمایش محل فروشگاه روی نقشه جهت نمایش به کاربر، فعال کنید.',
 				],
 				[
 					'label' => 'مکان فروشگاه',
 					'name'  => 'store_location',
 					'type'  => 'map',
-					'desc'  => 'مکان جغرافیایی فروشگاه خود را روی نقشه انتخاب کنید تا در محاسبات و سرویس های نقشه مورد استفاده قرار گیرد.'
+					'desc'  => 'مکان جغرافیایی فروشگاه خود را روی نقشه انتخاب کنید تا در محاسبات و سرویس های نقشه مورد استفاده قرار گیرد.',
 				],
 				[
 					'label'   => 'محاسبه فاصله',

@@ -2,10 +2,10 @@
 Contributors: mahdiy,nabiknet
 Tags: حمل و نقل,ووکامس,ووکامرس فارسی,پست,تیپاکس
 Donate link: https://l.nabik.net/pws-pro?utm_source=donate
-Requires at least: 6.0.0
-Tested up to: 6.7.1
+Requires at least: 6.8
+Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 4.3.1
+Stable tag: 4.4.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -70,7 +70,7 @@ License URI: https://www.gnu.org/licenses/gpl-3.0.html
 ## سازگاری
 * Woocommerce 7.*, 8.*, 9.*, 10.*
 * Wordpress 6.*
-* PHP 7.*, 8.*
+* PHP 7.4 - 8.3
 
 == Installation ==
 = نصب =
@@ -101,6 +101,21 @@ Ask your questions in [Persian Woocommerce Shipping](https://nabik.net/contact/)
 6. Support Tapin dashboard
 
 == Changelog ==
+= 4.4.0 =
+* بهبود تجربه کاربری پیک موتوری - قابلیت تعیین سریع مناطق سرویس‌دهی
+* بروزرسانی نرخ نامه پیشتاز و ویژه تاپین
+* پویا شدن ویرایش روش‌های حمل و نقل شهرهای هر استان
+* بهبود ذخیره کش جزییات فروشگاه تاپین
+* بهبود autoload تنظیمات شهرها
+* محاسبه مالیات محصولات برای ثبت در تاپین
+* در نظر گرفتن قیمت بدون تخفیف برای ثبت در تاپین
+* حذف فایل‌های index.php
+= 4.3.2 =
+* بروزرسانی نرخ نامه پست پیشتاز سرویس پست کتاب
+* افزودن ویژگی های محصول به عنوان محصول در تاپین
+* غیرفعالسازی پرداخت در محل و پس کرایه در پست کتاب
+* سازگاری با افزونه‌های فروش لایسنس با ووکامرس
+* بهبود فرآیند نصب افزونه گیت‌لند
 = 4.3.1 =
 * بروزرسانی نرخ نامه پستی استان‌های مرزی تاپین
 * موقت - حل مشکل کارنکردن لیست سفارشات تصادفی ووکامرس

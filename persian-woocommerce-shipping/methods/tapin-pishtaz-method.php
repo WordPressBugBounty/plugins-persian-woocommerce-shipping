@@ -40,58 +40,38 @@ class Tapin_Pishtaz_Method extends PWS_Tapin_Method {
 
 		$box_size = max( 1, min( 10, $args['box_size'] ) );
 
-		if ( $gateway == 'tapin' ) {
-
-			if ( $args['from_province'] == $args['to_province'] ) {
-				$vicinity = 'in';
-			} elseif ( PWS()->check_states_beside( $args['from_province'], $args['to_province'] ) ) {
-				$vicinity = 'beside';
-			} else {
-				$vicinity = 'out';
-			}
-
-			$box_rates = include PWS_DIR . '/data/pishtaz-rates.php';
-
-			if ( in_array( $args['from_province'], [ 3, 4, 5, 7, 15, 16, 18, 19, 21, 23, 26, 27, 29, 30 ] ) ) {
-				$box_rates = include PWS_DIR . '/data/border-pishtaz-rates.php';
-			}
-
-			$weight_index = min( ceil( $weight / 1000 ) * 1000, 30000 );
-			$weight_index = max( 1000, $weight_index );
-
-			$cost = $box_rates[ $weight_index ][ $box_size ][ $vicinity ];
-
-			if ( in_array( $args['to_city'], [ 91, 61, 51, 71, 81 ] ) ) {
-				$cost *= 1.15;
-			}
-
-			if ( in_array( $args['to_city'], [ 1, 31 ] ) ) {
-				$cost *= 1.20;
-			}
-
+		if ( $args['from_province'] == $args['to_province'] ) {
+			$vicinity = 'in';
+		} elseif ( PWS()->check_states_beside( $args['from_province'], $args['to_province'] ) ) {
+			$vicinity = 'beside';
 		} else {
+			$vicinity = 'out';
+		}
 
-			$box_rates    = include PWS_DIR . '/data/posteketab-rates.php';
-			$weight_index = min( ceil( $weight / 1000 ) * 1000, 30000 );
-			$weight_index = max( 1000, $weight_index );
+		$box_rates = include PWS_DIR . '/data/rates/tapin-pishtaz.php';
 
-			if ( $weight <= 500 ) {
-				$weight_index = 500;
-			}
+		if ( in_array( $args['from_province'], [ 3, 4, 5, 7, 15, 16, 18, 19, 21, 23, 26, 27, 29, 30 ] ) ) {
+			$box_rates = include PWS_DIR . '/data/rates/tapin-pishtaz-border.php';
+		}
 
-			$cost = $box_rates[ $weight_index ][ $box_size ];
+		$weight_index = min( ceil( $weight / 1000 ) * 1000, 30000 );
+		$weight_index = max( 1000, $weight_index );
 
-			if ( in_array( $box_size, range( 1, 3 ) ) && $weight >= 2650 ) {
-				$additions[] = 1.25;
-			}
+		$cost = $base_cost = $box_rates[ $weight_index ][ $box_size ][ $vicinity ];
 
+		if ( in_array( $args['to_city'], [ 91, 61, 51, 71, 81 ] ) ) {
+			$cost += $base_cost * 0.15;
+		} else if ( in_array( $args['to_city'], [ 1, 31 ] ) ) {
+			$cost += $base_cost * 0.20;
+		}
+
+		if ( $gateway == 'posteketab' ) {
+			$cost *= 0.7;
 		}
 
 		if ( $args['content_type'] != 1 ) {
-			$additions[] = 1.25;
+			$cost += $base_cost * 0.25;
 		}
-
-		$cost *= max( $additions );
 
 		// INSURANCE
 		if ( $args['price'] >= 50_000_000 ) {

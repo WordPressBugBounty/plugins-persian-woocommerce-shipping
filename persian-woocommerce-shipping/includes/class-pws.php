@@ -781,6 +781,31 @@ class PWS_Core {
 		return is_wp_error( $city ) || is_null( $city ) ? null : $city->name;
 	}
 
+	public static function districts( $city_id ): array {
+
+		$districts = get_terms( [
+			'taxonomy'   => 'state_city',
+			'hide_empty' => false,
+			'parent'     => $city_id,
+		] );
+
+		if ( is_wp_error( $districts ) ) {
+			$districts = [];
+		} else {
+			$districts = array_column( $districts, 'name', 'term_id' );
+		}
+
+		return apply_filters( 'pws_districts', $districts, $city_id );
+	}
+
+	public static function get_district( $district_id ): ?string {
+
+		/** @var WP_Term $district */
+		$district = get_term( $district_id, 'state_city' );
+
+		return is_wp_error( $district ) || is_null( $district ) ? null : $district->name;
+	}
+
 	public function check_states_beside( $source, $destination ): bool {
 
 		if ( $source == $destination ) {
@@ -1021,17 +1046,11 @@ class PWS_Core {
 	}
 
 	public function get_term_option( $term_id ): array {
-
-		$option = get_option( 'nabik_taxonomy_' . $term_id, [] );
-
-		return apply_filters( 'pws_get_term_option', $option, $term_id );
+		return get_option( 'nabik_taxonomy_' . $term_id, [] );
 	}
 
 	public function set_term_option( $term_id, array $option ) {
-
-		$option = apply_filters( 'pws_set_term_option', $option, $term_id );
-
-		update_option( 'nabik_taxonomy_' . $term_id, $option );
+		update_option( 'nabik_taxonomy_' . $term_id, $option, false );
 	}
 
 	public function delete_term_option( $term_id ) {

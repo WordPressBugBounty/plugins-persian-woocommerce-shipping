@@ -200,8 +200,8 @@ class PWS_Tapin extends PWS_Core {
 
 	public function cart_shipping_packages( $packages ) {
 
-		for ( $i = 0; $i < count( $packages ); $i ++ ) {
-			$packages[ $i ]['destination']['is_cod'] = WC()->session->get( 'chosen_payment_method' ) == 'cod';
+		foreach ( $packages as $key => $package ) {
+			$packages[ $key ]['destination']['is_cod'] = WC()->session->get( 'chosen_payment_method' ) == 'cod';
 		}
 
 		return $packages;
@@ -232,9 +232,11 @@ class PWS_Tapin extends PWS_Core {
 
 	public static function request( $path, $data = [], $associative = null ) {
 
-		$path = trim( $path, ' /' );
-
-		$url = sprintf( 'https://api.%s/api/%s/', self::$gateways[ self::$gateway ], $path );
+		$url = sprintf(
+			'https://api.%s/api/%s/',
+			self::$gateways[ self::$gateway ],
+			trim( $path, ' /' )
+		);
 
 		$curl = curl_init();
 
@@ -361,6 +363,14 @@ class PWS_Tapin extends PWS_Core {
 		$cities = self::cities();
 
 		return $cities[ $city_id ] ?? null;
+	}
+
+	public static function districts( $city_id ): array {
+		return [];
+	}
+
+	public static function get_district( $district_id ): ?string {
+		return null;
 	}
 
 	public function check_states_beside( $source, $destination ): bool {
@@ -551,47 +561,42 @@ class PWS_Tapin extends PWS_Core {
 	}
 
 	public function get_term_option( $term_id ): array {
-
-		$option = get_option( 'nabik_taxonomy_tapin_' . $term_id, [] );
-
-		return apply_filters( 'pws_get_term_option', $option, $term_id );
+		return get_option( 'nabik_taxonomy_tapin_' . $term_id, [] );
 	}
 
 	public function set_term_option( $term_id, array $option ) {
-
-		$option = apply_filters( 'pws_set_term_option', $option, $term_id );
-
-		update_option( 'nabik_taxonomy_tapin_' . $term_id, $option );
+		update_option( 'nabik_taxonomy_tapin_' . $term_id, $option, false );
 	}
 
 	public function delete_term_option( $term_id ) {
 		delete_option( 'nabik_taxonomy_tapin_' . $term_id );
 	}
 
-	public static function shop() {
+	public static function shop(): array {
 
-		if ( empty( PWS()->get_option( 'tapin.shop_id' ) ) ) {
-			return new stdClass();
+		$shop_id = PWS()->get_option( 'tapin.shop_id' );
+
+		if ( empty( $shop_id ) ) {
+			return [];
 		}
 
-		$shop = get_transient( 'pws_tapin_shop' );
+		$shop = get_transient( 'pws_tapin_shop_' . $shop_id );
 
 		if ( $shop === false || count( (array) $shop ) == 0 ) {
 
 			PWS_Tapin::set_gateway( PWS()->get_option( 'tapin.gateway' ) );
 
 			$shop = self::request( 'v2/public/shop/detail', [
-				'shop_id' => PWS()->get_option( 'tapin.shop_id' ),
-			] );
+				'shop_id' => $shop_id,
+			], true );
 
 			if ( is_wp_error( $shop ) ) {
-				return get_option( 'pws_tapin_shop', [] );
+				return [];
 			} else {
-				$shop = $shop->entries;
+				$shop = $shop['entries'];
 			}
 
-			set_transient( 'pws_tapin_shop', $shop, DAY_IN_SECONDS );
-			update_option( 'pws_tapin_shop', $shop );
+			set_transient( 'pws_tapin_shop_' . $shop_id, $shop, DAY_IN_SECONDS );
 		}
 
 		return $shop;
