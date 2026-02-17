@@ -137,7 +137,7 @@ class PWS_Notice {
 			[
 				'id'        => 'pws_video',
 				'content'   => '<b>آموزش:</b> برای پیکربندی حمل و نقل می توانید از <a href="https://yun.ir/pwsvideo" target="_blank">اینجا</a> فیلم های آموزشی افزونه را مشاهده کنید.',
-				'condition' => class_exists( 'WC_Data_Store' ) && ! count( WC_Data_Store::load( 'shipping-zone' )->get_zones() ),
+				'condition' => count( PWS_City::zones() ) == 1,
 				'dismiss'   => 6 * MONTH_IN_SECONDS,
 			],
 			[

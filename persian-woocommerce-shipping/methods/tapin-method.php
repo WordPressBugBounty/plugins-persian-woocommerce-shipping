@@ -139,10 +139,7 @@ class PWS_Tapin_Method extends PWS_Shipping_Method {
 				continue;
 			}
 
-			$price += wc_get_price_including_tax( $product, [
-				'qty'   => $cart_item['quantity'],
-				'price' => $product->get_regular_price(),
-			] );
+			$price += $product->get_price() * $cart_item['quantity'];
 		}
 
 		$destination = $package['destination'];

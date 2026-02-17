@@ -67,7 +67,7 @@ class PWS_Admin {
 			$submenus[60] = [
 				'title'      => 'نسخه حرفه‌ای',
 				'capability' => $capability,
-				'slug'       => PWS()->pws_pro_url( 'menu' ),
+				'slug'       => 'link-to-pws-pro',
 				'callback'   => '',
 			];
 		}
@@ -91,7 +91,9 @@ class PWS_Admin {
 		?>
 		<script type="text/javascript">
             jQuery(document).ready(function ($) {
-                $("a[href*='l.nabik.net']").attr('target', '_blank');
+                $("#toplevel_page_pws-tools a[href$='link-to-pws-pro']")
+                    .attr('href', '<?php echo esc_url( PWS()->pws_pro_url( 'menu' ) ); ?>')
+                    .attr('target', '_blank');
             });
 		</script>
 		<?php

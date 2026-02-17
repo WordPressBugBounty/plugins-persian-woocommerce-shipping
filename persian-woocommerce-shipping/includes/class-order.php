@@ -121,9 +121,7 @@ class PWS_Order {
 				continue;
 			}
 
-			$price = wc_get_price_including_tax( $product, [
-				'price' => $product->get_regular_price(),
-			] );
+			$price = ( $order_item->get_total() + $order_item->get_total_tax() ) / $order_item->get_quantity();
 			$price = ceil( $price );
 
 			$price = PWS()->convert_currency_to_IRR( $price );

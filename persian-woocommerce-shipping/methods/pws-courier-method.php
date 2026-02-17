@@ -76,6 +76,8 @@ class WC_Courier_Method extends PWS_Shipping_Method {
 
 		}
 
+		// @todo delivery areas are in zone criteria?
+
 		$this->instance_form_fields += [
 			'delivery_areas' => [
 				'title'       => 'مناطق سرویس‌دهی',
