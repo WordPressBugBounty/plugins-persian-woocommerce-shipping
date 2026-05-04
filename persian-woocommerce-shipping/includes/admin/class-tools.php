@@ -45,7 +45,7 @@ class PWS_Settings_Tools extends PWS_Settings {
 			'pws_tools' => [
 				[
 					'name' => 'html',
-					'desc' => '<b>آموزش:</b> برای پیکربندی حمل و نقل می توانید از <a href="https://yun.ir/pwsvideo" target="_blank">اینجا</a> فیلم های آموزشی افزونه را مشاهده کنید.',
+					'desc' => '<b>آموزش:</b> برای پیکربندی حمل و نقل می توانید از <a href="https://l.nabik.net/pws-video" target="_blank">اینجا</a> فیلم های آموزشی افزونه را مشاهده کنید.',
 					'type' => 'html',
 				],
 				[

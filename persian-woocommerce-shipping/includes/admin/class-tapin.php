@@ -78,7 +78,7 @@ class PWS_Settings_Tapin extends PWS_Settings {
 			'pws_tapin'    => [
 				[
 					'name' => 'banner',
-					'desc' => '<a href="https://yun.ir/pwstd" target="_blank"><img src="' . PWS_URL . 'assets/images/tapin.jpg" style="width: 100%;"></a>',
+					'desc' => '<a href="https://l.nabik.net/tapin?utm_source=pws-banner" target="_blank"><img src="' . PWS_URL . 'assets/images/tapin.jpg" style="width: 100%;"></a>',
 					'type' => 'html',
 				],
 				[

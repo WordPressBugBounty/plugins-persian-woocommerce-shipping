@@ -668,7 +668,7 @@ class PWS_Core {
 		}
 
 		if ( ctype_alnum( $replace['{state}'] ) && strlen( $replace['{state}'] ) == 3 && function_exists( 'PW' ) ) {
-			$replace['{state}'] = PW()->address->states[ $args['state'] ] ?? $args['state'];
+			$replace['{state}'] = PW()->address::$states[ $args['state'] ] ?? $args['state'];
 		}
 
 		if ( ctype_alnum( $replace['{state}'] ) && strlen( $replace['{state}'] ) == 3 ) {

@@ -69,23 +69,12 @@ class PWS_Map {
 	}
 
 	public static function is_valid_page(): bool {
-		// Get the current screen, this method is only available in admin area
-		$screen_id = is_admin() ? get_current_screen()->id : null;
-
-		// Check if pws_map shortcode is executing in current post
-		$post_has_shortcode = self::post_has_shortcode();
-
-		// Check if it's the WooCommerce Orders admin page
-		// The is_admin() condition is already on $screen variable, so I won't repeat it here
+		$screen_id               = is_admin() && function_exists( 'get_current_screen' ) ? get_current_screen()->id : null;
+		$post_has_shortcode      = self::post_has_shortcode();
 		$is_wc_orders_admin_page = ! empty( $screen_id ) && ( $screen_id == 'shop_order' || $screen_id == 'woocommerce_page_wc-orders' );
+		$is_checkout_page        = ! is_admin() && function_exists( 'is_checkout' ) && is_checkout();
+		$is_my_account_page      = is_account_page();
 
-		// Check if it's the Checkout page
-		$is_checkout_page = ! is_admin() && function_exists( 'is_checkout' ) && is_checkout();
-
-		// Check if it's my account page
-		$is_my_account_page = is_account_page();
-
-		// Validate the project page
 		return PWS_Map::is_admin_tools_page() || $is_wc_orders_admin_page || $is_checkout_page || $is_my_account_page || $post_has_shortcode;
 	}
 

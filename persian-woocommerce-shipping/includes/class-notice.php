@@ -112,13 +112,13 @@ class PWS_Notice {
 			],
 			[
 				'id'        => 'dokan_shipping',
-				'content'   => sprintf( '<b>حمل و نقل دکان:</b> در صورتی که قصد ایجاد یک مارکت‌پلیس حرفه‌ای و قدرتمند را دارید، می‌توانید با استفاده از <a href="%s" target="_blank">اولین و تنها افزونه حمل و نقل برای دکان</a> سیستم حمل و نقل فروشگاه‌تان را مدیریت کنید.', 'https://yun.ir/pwsdokan' ),
+				'content'   => sprintf( '<b>حمل و نقل دکان:</b> در صورتی که قصد ایجاد یک مارکت‌پلیس حرفه‌ای و قدرتمند را دارید، می‌توانید با استفاده از <a href="%s" target="_blank">اولین و تنها افزونه حمل و نقل برای دکان</a> سیستم حمل و نقل فروشگاه‌تان را مدیریت کنید.', 'https://l.nabik.net/pws-dokan?utm_source=pws' ),
 				'condition' => ( $tab == 'shipping' || $page == 'dokan' ) && is_plugin_active( 'dokan-lite/dokan.php' ) && is_plugin_inactive( 'persian-woocommerce-shipping-dokan/pws-dokan.php' ),
 				'dismiss'   => 6 * MONTH_IN_SECONDS,
 			],
 			[
 				'id'        => 'nrr_product_reviews',
-				'content'   => sprintf( '<b>نظرسنجی خودکار ووکامرس:</b> جهت افزایش تعداد نظرات فروشگاه‌تان، می‌توانید با استفاده از <a href="%s" target="_blank">افزونه نظرسنجی خودکار ندا</a> با ارسال خودکار پیامک، برای هر سفارش از مشتریان خود درخواست ثبت نظر کنید. | کدتخفیف: pws20', 'https://yun.ir/pwsneda' ),
+				'content'   => sprintf( '<b>نظرسنجی خودکار ووکامرس:</b> جهت افزایش تعداد نظرات فروشگاه‌تان، می‌توانید با استفاده از <a href="%s" target="_blank">افزونه نظرسنجی خودکار ندا</a> با ارسال خودکار پیامک، برای هر سفارش از مشتریان خود درخواست ثبت نظر کنید. | کدتخفیف: pws20', 'https://l.nabik.net/neda?utm_source=pws' ),
 				'condition' => $page == 'product-reviews' && is_plugin_inactive( 'nabik-review-reminder/nabik-review-reminder.php' ),
 				'dismiss'   => 6 * MONTH_IN_SECONDS,
 			],
@@ -136,7 +136,7 @@ class PWS_Notice {
 			],
 			[
 				'id'        => 'pws_video',
-				'content'   => '<b>آموزش:</b> برای پیکربندی حمل و نقل می توانید از <a href="https://yun.ir/pwsvideo" target="_blank">اینجا</a> فیلم های آموزشی افزونه را مشاهده کنید.',
+				'content'   => '<b>آموزش:</b> برای پیکربندی حمل و نقل می توانید از <a href="https://l.nabik.net/pws-video" target="_blank">اینجا</a> فیلم های آموزشی افزونه را مشاهده کنید.',
 				'condition' => count( PWS_City::zones() ) == 1,
 				'dismiss'   => 6 * MONTH_IN_SECONDS,
 			],

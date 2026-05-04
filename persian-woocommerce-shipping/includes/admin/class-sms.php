@@ -46,7 +46,7 @@ class PWS_Settings_SMS extends PWS_Settings {
 لطفا به نکات زیر توجه نمایید:<ol>
 								<li>برای ارسال نکردن پیامک در وضعیت خاص، روبروی آن را خالی بگذارید.</li>
 								<li>بجای CODE، کد متن دریافت شده از پنل پیامک را قرار دهید.</li>
-								<li>برای ثبت پترن جدید و دریافت کد متن، <a href="https://yun.ir/pwssmsp" target="_blank">اینجا</a> کلیک کنید.</li>
+								<li>برای ثبت پترن جدید و دریافت کد متن، <a href="https://l.nabik.net/melipayamak-pattern?utm_source=pws" target="_blank">اینجا</a> کلیک کنید.</li>
 								</ol>',
 				'type' => 'html',
 			],
@@ -108,12 +108,12 @@ class PWS_Settings_SMS extends PWS_Settings {
 			'pws_sms_config' => [
 				[
 					'name' => 'html',
-					'desc' => '<b>ملی پیامک:</b> پنل پیامک حرفه ای و پر سرعت را با کد تخفیف 10 درصدی <b>pws10</b> از <a href="https://yun.ir/pwssms" target="_blank">ملی پیامک</a> تهیه کنید.',
+					'desc' => '<b>ملی پیامک:</b> پنل پیامک حرفه ای و پر سرعت را با کد تخفیف 10 درصدی <b>pws10</b> از <a href="https://l.nabik.net/melipayamak?utm_source=pws10" target="_blank">ملی پیامک</a> تهیه کنید.',
 					'type' => 'html',
 				],
 				[
 					'name' => 'tutorial',
-					'desc' => '<b>آموزش:</b> آموزش پیکربندی استاندارد پیامک افزونه حمل و نقل را از <a href="https://yun.ir/pwssmst" target="_blank">اینجا</a> مشاهده کنید.',
+					'desc' => '<b>آموزش:</b> آموزش پیکربندی استاندارد پیامک افزونه حمل و نقل را از <a href="https://l.nabik.net/melipayamak-pws" target="_blank">اینجا</a> مشاهده کنید.',
 					'type' => 'html',
 				],
 				[
@@ -131,7 +131,7 @@ class PWS_Settings_SMS extends PWS_Settings {
 				[
 					'name'              => 'username',
 					'label'             => 'نام کاربری',
-					'desc'              => 'نام کاربری پنل پیامک <a href="https://yun.ir/pwssms" target="_blank">ملی پیامک</a>',
+					'desc'              => 'نام کاربری پنل پیامک <a href="https://l.nabik.net/melipayamak?utm_source=pws" target="_blank">ملی پیامک</a>',
 					'type'              => 'text',
 					'default'           => '',
 					'sanitize_callback' => 'sanitize_text_field',

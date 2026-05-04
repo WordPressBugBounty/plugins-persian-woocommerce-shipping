@@ -5,7 +5,7 @@ Donate link: https://l.nabik.net/pws-pro?utm_source=donate
 Requires at least: 6.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 4.4.1
+Stable tag: 4.4.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -35,7 +35,7 @@ License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
 ## نسخه حرفه‌ای
 نیاز به امکانات حرفه‌ای تر دارید؟ [نسخه حرفه‌ای](https://l.nabik.net/pws-pro?utm_source=repo) را بررسی کنید:
-* محاسبه اتوماتیک هزینه پست پیشتاز بر اساس وزن (تعرفه سال 1404)
+* محاسبه اتوماتیک هزینه پست پیشتاز بر اساس وزن (تعرفه سال 1405)
 * تعریف شرط برای روش‌های حمل و نقل (براساس استان، شهر، محصول، دسته بندی، کلاس حمل و نقل، نقش کاربری، روش پرداخت، وزن، مجموع سبد خرید، تعداد اقلام سبد خرید و...)
 * بارگذاری سریع لیست شهرها
 * نمایش لیست شهرها در حساب کاربری
@@ -101,6 +101,12 @@ Ask your questions in [Persian Woocommerce Shipping](https://nabik.net/contact/)
 6. Support Tapin dashboard
 
 == Changelog ==
+= 4.4.4 =
+* حل مشکل لینک های کوتاه
+= 4.4.3 =
+* بروزرسانی نرخ نامه پست ویژه تاپین
+= 4.4.2 =
+* بروزرسانی نرخ نامه پست پیشتاز تاپین
 = 4.4.1 =
 * حل مشکل ثبت سفارشات COD در تاپین
 * بهینه‌سازی سرعت سیستم اطلاع رسانی
