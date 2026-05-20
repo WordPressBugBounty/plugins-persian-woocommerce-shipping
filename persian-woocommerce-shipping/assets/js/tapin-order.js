@@ -1,5 +1,7 @@
 jQuery(document).ready(function ($) {
 
+    const tapin_weight = $('#tapin_weight');
+    const tapin_box_size = $('#tapin_box_size');
     let pws_button_submit = $("#pws-tapin-submit");
     let pws_button_ship = $("#pws-tapin-ship");
 
@@ -29,9 +31,9 @@ jQuery(document).ready(function ($) {
             'action': 'pws_change_order_status',
             'id': id,
             'status': status,
-            'weight': $('#tapin_weight').val(),
+            'weight': tapin_weight.val(),
             'content_type': $('#tapin_content_type').val(),
-            'box_size': $('#tapin_box_size').val(),
+            'box_size': tapin_box_size.val(),
         };
 
         $(".pws-tips").html(`

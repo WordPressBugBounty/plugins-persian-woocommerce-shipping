@@ -5,7 +5,7 @@ Donate link: https://l.nabik.net/pws-pro?utm_source=donate
 Requires at least: 6.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 4.4.4
+Stable tag: 4.4.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -101,6 +101,10 @@ Ask your questions in [Persian Woocommerce Shipping](https://nabik.net/contact/)
 6. Support Tapin dashboard
 
 == Changelog ==
+= 4.4.5 =
+* افزونه پاکت های A5، A4 و A3
+* قابلیت ثبت در تاپین به صورت پاکت جوف
+* معرفی کانال نابیک در بله (https://ble.ir/nabik_net)
 = 4.4.4 =
 * حل مشکل لینک های کوتاه
 = 4.4.3 =

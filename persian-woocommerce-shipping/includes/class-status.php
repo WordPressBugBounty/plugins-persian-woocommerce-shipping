@@ -498,6 +498,22 @@ class PWS_Status {
 
 			$tapin_pay_type = PWS_Order::get_shipping_payment_type( $order ) == 'postpaid' ? 2 : 1;
 
+			$tapin_packet_type = 2;
+
+			if ( in_array( $tapin_box_size, [ 11, 12, 13 ] ) ) {
+				$tapin_packet_type = 3;
+
+				if ( $order_weight > 2_000 ) {
+
+					echo json_encode( [
+						'success' => false,
+						'message' => 'وزن مرسوله‌های پاکت A4، A5 و A3 باید کمتر از ۲۰۰۰ گرم باشد.',
+					] );
+
+					die();
+				}
+			}
+
 			if ( $order->get_payment_method() == 'cod' ) {
 				$tapin_pay_type = 3;
 
@@ -548,6 +564,7 @@ class PWS_Status {
 				'postal_code'    => $postcode,
 				'pay_type'       => $tapin_pay_type,
 				'order_type'     => $tapin_post_type,
+				'packet_type'    => $tapin_packet_type,
 				'content_type'   => $tapin_content_type,
 				'box_id'         => $tapin_box_size,
 				'package_weight' => $order_weight,

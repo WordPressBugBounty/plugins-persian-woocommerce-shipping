@@ -74,6 +74,12 @@ class PWS_Settings_Tapin extends PWS_Settings {
 			do_action( 'pws_state_city_updated' );
 		}
 
+		$box_sizes = PWS_Tapin::box_sizes();
+
+		unset( $box_sizes[11] );
+		unset( $box_sizes[12] );
+		unset( $box_sizes[13] );
+
 		return [
 			'pws_tapin'    => [
 				[
@@ -127,7 +133,7 @@ class PWS_Settings_Tapin extends PWS_Settings {
 					'default' => 1,
 					'type'    => 'select',
 					'desc'    => 'نرخ‌نامه پستی به صورت پیشفرض براساس این حجم محاسبه می‌شود. (در بخش ویرایش سفارش، برای هر سفارش قابل تغییر و شخصی سازی است)',
-					'options' => PWS_Tapin::box_sizes(),
+					'options' => $box_sizes,
 				],
 				[
 					'label'   => 'وضعیت ثبت مرسوله',

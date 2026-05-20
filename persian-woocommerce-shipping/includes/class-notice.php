@@ -111,6 +111,12 @@ class PWS_Notice {
 				'dismiss'   => WEEK_IN_SECONDS,
 			],
 			[
+				'id'        => 'bale_channel',
+				'content'   => sprintf( '<b>کانال بله:</b> تا اطلاع ثانوی و فعالسازی مجدد کانال نابیک در تلگرام، می‌توانید ما را در پیام‌رسان بله دنبال کنید | <a href="%s" target="_blank">کانال نابیک در پیام‌رسان بله</a>', 'https://ble.ir/nabik_net' ),
+				'condition' => true,
+				'dismiss'   => 6 * MONTH_IN_SECONDS,
+			],
+			[
 				'id'        => 'dokan_shipping',
 				'content'   => sprintf( '<b>حمل و نقل دکان:</b> در صورتی که قصد ایجاد یک مارکت‌پلیس حرفه‌ای و قدرتمند را دارید، می‌توانید با استفاده از <a href="%s" target="_blank">اولین و تنها افزونه حمل و نقل برای دکان</a> سیستم حمل و نقل فروشگاه‌تان را مدیریت کنید.', 'https://l.nabik.net/pws-dokan?utm_source=pws' ),
 				'condition' => ( $tab == 'shipping' || $page == 'dokan' ) && is_plugin_active( 'dokan-lite/dokan.php' ) && is_plugin_inactive( 'persian-woocommerce-shipping-dokan/pws-dokan.php' ),
@@ -123,8 +129,8 @@ class PWS_Notice {
 				'dismiss'   => 6 * MONTH_IN_SECONDS,
 			],
 			[
-				'id'        => 'post_rate_7',
-				'content'   => sprintf( '<b>تعرفه پستی دی ۱۴۰۴:</b> تعرفه‌های اداره پست بروزرسانی شد. جهت بهره‌مندی از تعرفه‌های پستی دی ۱۴۰۴، می‌توانید <a href="%s" target="_blank">نسخه حرفه‌ای افزونه حمل و نقل</a> را نصب و فعال نمایید. ', PWS()->pws_pro_url( 'post_1404' ) ),
+				'id'        => 'post_rate_1405',
+				'content'   => sprintf( '<b>تعرفه پستی ۱۴۰۵:</b> تعرفه‌های اداره پست بروزرسانی شد. جهت بهره‌مندی از تعرفه‌های پستی ۱۴۰۵، می‌توانید <a href="%s" target="_blank">نسخه حرفه‌ای افزونه حمل و نقل</a> را نصب و فعال نمایید. ', PWS()->pws_pro_url( 'post_1405' ) ),
 				'condition' => ! $has_pws_pro,
 				'dismiss'   => MONTH_IN_SECONDS,
 			],

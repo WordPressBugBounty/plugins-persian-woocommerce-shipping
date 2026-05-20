@@ -79,7 +79,7 @@ class PWS_Admin {
 
 			add_action( 'admin_init', function () use ( $submenu ) {
 				$callback = $submenu['callback'][0] ?? null;
-				if ( is_string( $callback ) && class_exists( $callback ) ) {
+				if ( is_string( $callback ) && class_exists( $callback ) && method_exists( $callback, 'instance' ) ) {
 					call_user_func( [ $callback, 'instance' ] );
 				}
 			}, 5 );
