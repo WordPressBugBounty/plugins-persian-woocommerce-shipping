@@ -203,12 +203,14 @@ class PWS_Status {
 				wp_enqueue_script( 'pws_tapin_order', PWS_URL . 'assets/js/tapin-order.js' );
 				wp_localize_script( 'pws_tapin_order', 'pws_tapin', [
 					'order_id' => intval( $_GET['id'] ?? 0 ),
+					'nonce'    => wp_create_nonce( 'pws_change_status' ),
 				] );
 			} else {
 				wp_enqueue_script( 'pws_tapin_list', PWS_URL . 'assets/js/tapin-list.js' );
 				wp_localize_script( 'pws_tapin_list', 'pws_tapin', [
 					'order_field'  => 'id',
 					'status_field' => 'tr#order-',
+					'nonce'        => wp_create_nonce( 'pws_change_status' ),
 				] );
 			}
 
@@ -218,6 +220,7 @@ class PWS_Status {
 				wp_enqueue_script( 'pws_tapin_order', PWS_URL . 'assets/js/tapin-order.js' );
 				wp_localize_script( 'pws_tapin_order', 'pws_tapin', [
 					'order_id' => intval( $_GET['post'] ),
+					'nonce'    => wp_create_nonce( 'pws_change_status' ),
 				] );
 			}
 
@@ -226,6 +229,7 @@ class PWS_Status {
 				wp_localize_script( 'pws_tapin_list', 'pws_tapin', [
 					'order_field'  => 'post',
 					'status_field' => 'tr#post-',
+					'nonce'        => wp_create_nonce( 'pws_change_status' ),
 				] );
 			}
 
@@ -407,6 +411,8 @@ class PWS_Status {
 	}
 
 	public function change_status_callback() {
+
+		check_ajax_referer( 'pws_change_status' );
 
 		if ( ! current_user_can( 'edit_shop_orders' ) ) {
 			wp_die( - 1 );

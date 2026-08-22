@@ -29,6 +29,7 @@ jQuery(document).ready(function ($) {
 
         let data = {
             'action': 'pws_change_order_status',
+            '_wpnonce': pws_tapin.nonce,
             'id': id,
             'status': status,
             'weight': tapin_weight.val(),

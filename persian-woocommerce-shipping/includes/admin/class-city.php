@@ -192,6 +192,8 @@ class PWS_City {
 
 		if ( isset( $_POST['submit'], $_POST['taxonomy'], $_POST['tag_ID'], $_POST['action'], $_POST['term_meta'] ) ) {
 
+			check_admin_referer( 'pws_edit_state' );
+
 			$expected_terms = array_flip( wp_list_pluck( $terms, 'term_id' ) );
 
 			foreach ( $_POST['term_meta'] as $term_id => $term ) {
@@ -252,6 +254,7 @@ class PWS_City {
 			?>
 
 			<form method="post" action="" class="validate">
+				<?php wp_nonce_field( 'pws_edit_state' ); ?>
 				<input type="hidden" name="action" value="editedtag"/>
 				<input type="hidden" name="tag_ID" value="<?php echo esc_attr( $state_term->term_id ) ?>"/>
 				<input type="hidden" name="taxonomy" value="<?php echo esc_attr( $state_term->taxonomy ) ?>"/>
