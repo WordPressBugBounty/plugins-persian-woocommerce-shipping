@@ -152,9 +152,13 @@ class PWS_Tapin_Method extends PWS_Shipping_Method {
 
 		$shop = PWS_Tapin::shop();
 
+		if ( isset( $shop['total_price'] ) ) {
+			$price += $shop['total_price'];
+		}
+
 		$args = [
 			'gateway'       => PWS()->get_option( 'tapin.gateway', 'tapin' ),
-			'price'         => min( $price, 1000000000 ), // Max insurance: 100MT
+			'price'         => min( $price, 5_000_000_000 ), // Max insurance: 500MT
 			'weight'        => ceil( $weight ),
 			'is_cod'        => $is_cod,
 			'to_province'   => intval( $destination['state'] ),
