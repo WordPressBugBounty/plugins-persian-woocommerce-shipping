@@ -92,7 +92,7 @@ class PWS_City {
 	public static function flush_cache() {
 		global $wpdb;
 
-		$caches = $wpdb->get_col( "SELECT option_name FROM `{$wpdb->options}` WHERE `option_name` LIKE ('_transient_pws%');" );
+		$caches = $wpdb->get_col( "SELECT option_name FROM `{$wpdb->options}` WHERE `option_name` LIKE ('\_transient_pws\_%');" );
 
 		foreach ( $caches as $cache ) {
 			delete_transient( str_replace( '_transient_', '', $cache ) );
